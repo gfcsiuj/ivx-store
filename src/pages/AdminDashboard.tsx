@@ -2,11 +2,11 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { LayoutGrid, Package, ExternalLink, Zap, Flame, Settings, TrendingUp, ClipboardList, LogOut, Loader2, MessageCircle, ArrowLeft, Users } from "lucide-react";
 import { AdminLogin } from "../components/admin/AdminLogin";
-import { onAuthChange, logoutAdmin, getServices, getPackages, getOffers, getOrders, getMessages, type User } from "../lib/firebase";
+import { onAuthChange, logoutAdmin, getServices, getPackages, getOffers, getOrders, getMessages, getAllUsers, ADMIN_UID, formatTimestamp, type User, type OrderData } from "../lib/firebase";
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import "../admin.css";
 
-// ADMIN UID — only this user can access the admin panel
-const ADMIN_UID = "1kxnlTP7AlZvFwc82E546aNFX8j2";
+
 
 interface DashboardButton {
   id: string;
@@ -34,6 +34,7 @@ export function AdminDashboard() {
   const [messageCnt, setMessageCnt] = useState(0);
   const [userCnt, setUserCnt] = useState(0);
   const [countsLoading, setCountsLoading] = useState(true);
+  const [ordersData, setOrdersData] = useState<OrderData[]>([]);
 
   useEffect(() => {
     const unsubscribe = onAuthChange((u) => {
@@ -56,27 +57,21 @@ export function AdminDashboard() {
     const loadAllCounts = async () => {
       setCountsLoading(true);
       try {
-        const [services, packages, offers, orders, messages, usersSnap] = await Promise.all([
+        const [services, packages, offers, orders, messages, usersData] = await Promise.all([
           getServices(),
           getPackages(),
           getOffers(),
           getOrders(),
           getMessages(),
-          // Don't import getAllUsers so we just fetch count with getDocs
-          import("firebase/firestore").then(m => m.getDocs(m.collection(import("../lib/firebase").then(f => f.db) as any, "users"))).catch(() => ({ docs: [] }))
+          getAllUsers(),
         ]);
         setServiceCnt(services.length);
         setPackageCnt(packages.length);
         setOfferCnt(offers.length);
         setOrderCnt(orders.filter(o => o.status === "pending").length);
         setMessageCnt(messages.filter(m => !m.read).length);
-        
-        try {
-           const { collection, getDocs } = await import("firebase/firestore");
-           const { db } = await import("../lib/firebase");
-           const uSnap = await getDocs(collection(db, "users"));
-           setUserCnt(uSnap.size);
-        } catch(e) {}
+        setUserCnt(usersData.length);
+        setOrdersData(orders);
       } catch (err) {
         console.error("Error loading counts:", err);
       }
@@ -95,6 +90,43 @@ export function AdminDashboard() {
     }
     setLoggingOut(false);
   };
+
+  // Prepare chart data (Last 7 days)
+  const chartData = React.useMemo(() => {
+    const days = 7;
+    const data = [];
+    for (let i = days - 1; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      d.setHours(0, 0, 0, 0);
+      data.push({
+        name: d.toLocaleDateString("ar-IQ", { weekday: "short" }),
+        dateStr: d.toISOString().split('T')[0],
+        orders: 0
+      });
+    }
+
+    ordersData.forEach(order => {
+      if (!order.createdAt) return;
+      let date;
+      // Handle Firebase Timestamp
+      if (typeof (order.createdAt as any).toDate === "function") {
+        date = (order.createdAt as any).toDate();
+      } else if ((order.createdAt as any).seconds) {
+        date = new Date((order.createdAt as any).seconds * 1000);
+      } else {
+        date = new Date(order.createdAt as any);
+      }
+
+      if (isNaN(date.getTime())) return;
+
+      const dateStr = date.toISOString().split('T')[0];
+      const pt = data.find(p => p.dateStr === dateStr);
+      if (pt) pt.orders += 1;
+    });
+
+    return data;
+  }, [ordersData]);
 
   // Loading state
   if (authState === "loading") {
@@ -173,13 +205,13 @@ export function AdminDashboard() {
           </div>
           <h1>لوحة تحكم IVX</h1>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+        <div className="admin-header-actions">
           {user?.email && (
-            <span style={{ fontSize: "0.8rem", color: "#666", fontWeight: 600 }}>{user.email}</span>
+            <span className="admin-header-email">{user.email}</span>
           )}
           <Link to="/" className="admin-back-btn">
             <ExternalLink size={16} />
-            عرض الموقع
+            <span className="admin-back-btn-text">عرض الموقع</span>
           </Link>
           <button
             className="admin-back-btn"
@@ -188,7 +220,7 @@ export function AdminDashboard() {
             style={{ color: "#ef4444", borderColor: "rgba(239,68,68,0.2)" }}
           >
             {loggingOut ? <Loader2 size={16} style={{ animation: "spin 1s linear infinite" }} /> : <LogOut size={16} />}
-            خروج
+            <span className="admin-back-btn-text">خروج</span>
           </button>
         </div>
       </header>
@@ -282,6 +314,35 @@ export function AdminDashboard() {
               </div>
             </button>
           ))}
+        </div>
+      </div>
+
+      {/* Charts Section */}
+      <div className="admin-chart-section" style={{ marginTop: "2rem", padding: "0 1.5rem" }}>
+        <h3 style={{ color: "#fff", marginBottom: "1.25rem", display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "1.1rem" }}>
+          <TrendingUp size={20} color="#f59e0b" />
+          طلبات المتجر (آخر 7 أيام)
+        </h3>
+        <div style={{ width: '100%', height: 280, background: 'rgba(255,255,255,0.02)', borderRadius: '20px', padding: '1rem', border: '1px solid rgba(255,255,255,0.05)', boxShadow: '0 10px 30px rgba(0,0,0,0.2)' }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -15, bottom: 0 }}>
+              <defs>
+                <linearGradient id="colorOrders" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.5}/>
+                  <stop offset="95%" stopColor="#f59e0b" stopOpacity={0}/>
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+              <XAxis dataKey="name" stroke="#9ca3af" axisLine={false} tickLine={false} tick={{ fill: '#9ca3af', fontSize: 12, fontFamily: 'Tajawal, sans-serif' }} dy={10} />
+              <YAxis stroke="#9ca3af" axisLine={false} tickLine={false} allowDecimals={false} tick={{ fill: '#9ca3af', fontSize: 12 }} dx={-10} />
+              <Tooltip 
+                contentStyle={{ backgroundColor: 'rgba(10,10,10,0.9)', backdropFilter: 'blur(10px)', borderColor: 'rgba(255,255,255,0.1)', color: '#fff', borderRadius: '12px', fontSize: '14px', fontFamily: 'Tajawal, sans-serif' }}
+                itemStyle={{ color: '#f59e0b', fontWeight: 'bold' }}
+                cursor={{ stroke: '#f59e0b', strokeWidth: 1, strokeDasharray: '3 3' }}
+              />
+              <Area type="monotone" dataKey="orders" name="الطلبات" stroke="#f59e0b" strokeWidth={3} fillOpacity={1} fill="url(#colorOrders)" animationDuration={1500} />
+            </AreaChart>
+          </ResponsiveContainer>
         </div>
       </div>
     </div>

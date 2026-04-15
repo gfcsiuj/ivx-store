@@ -1,14 +1,16 @@
+import React, { useState, useEffect } from "react";
 import { motion } from "motion/react";
-import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft, Loader2, Heart } from "lucide-react";
 import { OrderModal } from "./OrderModal";
+import { ServiceDetailsModal } from "./ServiceDetailsModal";
 import { ServiceData, getServices, formatDisplayPrice } from "../lib/firebase";
 
 export function OurServices() {
   const [services, setServices] = useState<ServiceData[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [detailsModalOpen, setDetailsModalOpen] = useState(false);
   const [selectedService, setSelectedService] = useState<ServiceData | null>(null);
   const [favorites, setFavorites] = useState<string[]>(() => {
     try { return JSON.parse(localStorage.getItem("ivx_fav_services") || "[]"); } catch { return []; }
@@ -44,6 +46,11 @@ export function OurServices() {
   const handleOrder = (service: ServiceData) => {
     setSelectedService(service);
     setIsModalOpen(true);
+  };
+
+  const handleDetails = (service: ServiceData) => {
+    setSelectedService(service);
+    setDetailsModalOpen(true);
   };
 
   if (!loading && services.length === 0) return null;
@@ -94,7 +101,8 @@ export function OurServices() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "100px" }}
                 transition={{ duration: 0.6, delay: idx * 0.1 }}
-                className="bg-gray-900/40 border border-white/10 rounded-2xl md:rounded-3xl overflow-hidden hover:border-white/30 transition-all duration-500 group flex flex-col"
+                onClick={() => handleDetails(service)}
+                className="bg-gray-900/40 border border-white/10 rounded-2xl md:rounded-3xl overflow-hidden hover:border-white/30 transition-all duration-500 group flex flex-col cursor-pointer"
               >
                 <div className="h-32 md:h-56 overflow-hidden relative">
                   <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors duration-500 z-10" />
@@ -142,7 +150,7 @@ export function OurServices() {
                     </div>
                   )}
                   <button
-                    onClick={() => handleOrder(service)}
+                    onClick={(e) => { e.stopPropagation(); handleOrder(service); }}
                     className="w-full py-2 md:py-3.5 bg-white text-black font-arabic font-bold rounded-lg md:rounded-xl hover:bg-gray-200 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 text-xs md:text-base"
                   >
                     اطلب الآن
@@ -176,6 +184,20 @@ export function OurServices() {
         selectedItem={selectedService?.title || ""}
         formFields={selectedService?.orderFormFields}
         itemType="service"
+        basePrice={selectedService?.price ? parseFloat(selectedService.price) : undefined}
+        baseCurrency={selectedService?.currency}
+      />
+
+      <ServiceDetailsModal
+        isOpen={detailsModalOpen}
+        onClose={() => { setDetailsModalOpen(false); setSelectedService(null); }}
+        service={selectedService}
+        isFavorite={selectedService ? favorites.includes(selectedService.id!) : false}
+        toggleFavorite={toggleFavorite}
+        onOrder={() => {
+          setDetailsModalOpen(false);
+          setIsModalOpen(true);
+        }}
       />
     </section>
   );

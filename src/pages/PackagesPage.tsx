@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "motion/react";
 import { PageHero } from "../components/PageHero";
 import { PageLayout } from "../components/PageLayout";
@@ -217,6 +217,8 @@ export function PackagesPage() {
         selectedItem={selectedPackage?.title || ""}
         formFields={selectedPackage?.orderFormFields}
         itemType="package"
+        basePrice={selectedPackage?.price ? parseFloat(selectedPackage.price) : undefined}
+        baseCurrency={selectedPackage?.currency}
       />
     </PageLayout>
   );

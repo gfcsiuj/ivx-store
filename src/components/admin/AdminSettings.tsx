@@ -72,7 +72,7 @@ export function AdminSettings({ onCountChange }: AdminSettingsProps) {
         </button>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "1.5rem" }}>
         {/* Contact Info */}
         <div className="admin-editor-form" style={{ borderRadius: "1.5rem", overflow: "hidden" }}>
           <div style={{ padding: "1rem 1.5rem", borderBottom: "1px solid rgba(255,255,255,0.06)", display: "flex", alignItems: "center", gap: "0.5rem" }}>

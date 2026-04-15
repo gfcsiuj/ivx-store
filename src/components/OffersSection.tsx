@@ -4,22 +4,39 @@ import { Clock, Flame, ArrowLeft, Percent, Sparkles } from "lucide-react";
 import { OrderModal } from "./OrderModal";
 import { OfferData, getActiveOffers } from "../lib/firebase";
 
-function CountdownTimer({ days, hours, minutes }: { days: number; hours: number; minutes: number }) {
-  const [time, setTime] = useState({ d: days, h: hours, m: minutes, s: 0 });
+function CountdownTimer({ days, hours, minutes, endsAt }: { days: number; hours: number; minutes: number; endsAt?: any }) {
+  const calcTimeFromEnd = () => {
+    if (!endsAt) return { d: days, h: hours, m: minutes, s: 0 };
+    const end = endsAt.toDate ? endsAt.toDate() : new Date(endsAt);
+    const diff = Math.max(0, end.getTime() - Date.now());
+    const totalSec = Math.floor(diff / 1000);
+    return {
+      d: Math.floor(totalSec / 86400),
+      h: Math.floor((totalSec % 86400) / 3600),
+      m: Math.floor((totalSec % 3600) / 60),
+      s: totalSec % 60,
+    };
+  };
+
+  const [time, setTime] = useState(calcTimeFromEnd);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setTime((prev) => {
-        let { d, h, m, s } = prev;
-        if (s > 0) { s--; }
-        else if (m > 0) { m--; s = 59; }
-        else if (h > 0) { h--; m = 59; s = 59; }
-        else if (d > 0) { d--; h = 23; m = 59; s = 59; }
-        return { d, h, m, s };
-      });
+      if (endsAt) {
+        setTime(calcTimeFromEnd());
+      } else {
+        setTime((prev) => {
+          let { d, h, m, s } = prev;
+          if (s > 0) { s--; }
+          else if (m > 0) { m--; s = 59; }
+          else if (h > 0) { h--; m = 59; s = 59; }
+          else if (d > 0) { d--; h = 23; m = 59; s = 59; }
+          return { d, h, m, s };
+        });
+      }
     }, 1000);
     return () => clearInterval(interval);
-  }, []);
+  }, [endsAt]);
 
   const blocks = [
     ...(time.d > 0 ? [{ value: time.d, label: "يوم" }] : []),
@@ -53,7 +70,6 @@ export function OffersSection() {
 
   useEffect(() => {
     getActiveOffers().then((data) => {
-      console.log("Active offers loaded:", data.length);
       setOffers(data);
       setLoading(false);
     }).catch((err) => {
@@ -232,6 +248,7 @@ export function OffersSection() {
                           days={offer.countdownDays ?? 0}
                           hours={offer.countdownHours ?? 0}
                           minutes={offer.countdownMinutes ?? 0}
+                          endsAt={offer.endsAt}
                         />
                       </div>
                     )}
@@ -258,6 +275,8 @@ export function OffersSection() {
         selectedItem={selectedOffer?.title || ""}
         formFields={selectedOffer?.orderFormFields}
         itemType="offer"
+        basePrice={selectedOffer?.discountedPrice ? parseFloat(selectedOffer.discountedPrice) : undefined}
+        baseCurrency={selectedOffer?.currency}
       />
     </section>
   );

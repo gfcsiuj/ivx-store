@@ -1,23 +1,13 @@
-import { useState, useEffect } from "react";
-import { ClipboardList, Loader2, Clock, CheckCircle2, XCircle, RefreshCw, User, Phone, FileText, Package, ChevronDown, Trash2, X, Mail, AtSign } from "lucide-react";
-import { OrderData, getOrders, updateOrderStatus, deleteOrder } from "../../lib/firebase";
+import React, { useState, useEffect } from "react";
+import { ClipboardList, Loader2, Clock, CheckCircle2, XCircle, RefreshCw, User, Phone, FileText, Package, ChevronDown, Trash2, X, Mail, AtSign, Download, Copy, DollarSign } from "lucide-react";
+import { OrderData, getOrders, updateOrderStatus, deleteOrder, formatTimestamp, formatPriceWithCommas, getCurrencySymbol } from "../../lib/firebase";
+import { STATUS_CONFIG, ITEM_TYPE_LABELS } from "../../lib/constants";
 
 interface AdminOrdersProps {
   onCountChange?: (count: number) => void;
 }
 
-const STATUS_CONFIG: Record<OrderData["status"], { label: string; color: string; bg: string; icon: React.ReactNode }> = {
-  pending: { label: "قيد الانتظار", color: "#f59e0b", bg: "rgba(245,158,11,0.1)", icon: <Clock size={14} /> },
-  processing: { label: "قيد المعالجة", color: "#3b82f6", bg: "rgba(59,130,246,0.1)", icon: <RefreshCw size={14} /> },
-  completed: { label: "مكتمل", color: "#22c55e", bg: "rgba(34,197,94,0.1)", icon: <CheckCircle2 size={14} /> },
-  cancelled: { label: "ملغي", color: "#ef4444", bg: "rgba(239,68,68,0.1)", icon: <XCircle size={14} /> },
-};
 
-const ITEM_TYPE_LABELS: Record<string, string> = {
-  service: "خدمة",
-  package: "باقة",
-  offer: "عرض",
-};
 
 function OrderDetailModal({ order, onClose, onStatusChange, onDelete }: {
   order: OrderData;
@@ -29,13 +19,13 @@ function OrderDetailModal({ order, onClose, onStatusChange, onDelete }: {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
-  const formatDate = (timestamp: any) => {
-    if (!timestamp) return "—";
-    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
-    return new Intl.DateTimeFormat("ar-IQ", {
-      year: "numeric", month: "short", day: "numeric",
-      hour: "2-digit", minute: "2-digit",
-    }).format(date);
+  const formatDate = formatTimestamp;
+  const [copiedText, setCopiedText] = useState<string | null>(null);
+
+  const handleCopy = (text: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedText(text);
+    setTimeout(() => setCopiedText(null), 2000);
   };
 
   return (
@@ -71,7 +61,19 @@ function OrderDetailModal({ order, onClose, onStatusChange, onDelete }: {
           </div>
           <div className="admin-detail-modal-info">
             <div className="admin-detail-modal-info-label"><Phone size={13} /> رقم الجوال</div>
-            <div className="admin-detail-modal-info-value" dir="ltr" style={{ textAlign: "left" }}>{order.customerPhone || "—"}</div>
+            <div className="admin-detail-modal-info-value" dir="ltr" style={{ textAlign: "left", display: "flex", alignItems: "center", justifyContent: "flex-end", gap: "8px" }}>
+              {order.customerPhone || "—"}
+              {order.customerPhone && (
+                <button 
+                  onClick={() => handleCopy(order.customerPhone)}
+                  className="admin-icon-btn" 
+                  title="نسخ"
+                  style={{ background: "transparent", border: "none", color: copiedText === order.customerPhone ? "#22c55e" : "#9ca3af", cursor: "pointer", padding: "4px" }}
+                >
+                  {copiedText === order.customerPhone ? <CheckCircle2 size={14} /> : <Copy size={14} />}
+                </button>
+              )}
+            </div>
           </div>
           <div className="admin-detail-modal-info">
             <div className="admin-detail-modal-info-label"><Clock size={13} /> تاريخ الطلب</div>
@@ -79,7 +81,19 @@ function OrderDetailModal({ order, onClose, onStatusChange, onDelete }: {
           </div>
           <div className="admin-detail-modal-info">
             <div className="admin-detail-modal-info-label"><AtSign size={13} /> إيميل التسجيل</div>
-            <div className="admin-detail-modal-info-value" dir="ltr" style={{ textAlign: "left" }}>{order.userRegisteredEmail || "—"}</div>
+            <div className="admin-detail-modal-info-value" dir="ltr" style={{ textAlign: "left", display: "flex", alignItems: "center", justifyContent: "flex-end", gap: "8px" }}>
+              {order.userRegisteredEmail || "—"}
+              {order.userRegisteredEmail && (
+                <button 
+                  onClick={() => handleCopy(order.userRegisteredEmail!)}
+                  className="admin-icon-btn" 
+                  title="نسخ"
+                  style={{ background: "transparent", border: "none", color: copiedText === order.userRegisteredEmail ? "#22c55e" : "#9ca3af", cursor: "pointer", padding: "4px" }}
+                >
+                  {copiedText === order.userRegisteredEmail ? <CheckCircle2 size={14} /> : <Copy size={14} />}
+                </button>
+              )}
+            </div>
           </div>
         </div>
 
@@ -88,8 +102,53 @@ function OrderDetailModal({ order, onClose, onStatusChange, onDelete }: {
           <div className="admin-detail-modal-section">
             <div className="admin-detail-modal-info-label" style={{ marginBottom: "0.35rem" }}><Mail size={13} /> الإيميل المُدخل في النموذج</div>
             {Object.entries(order.customFields).filter(([k]) => k.toLowerCase().includes("email") || k.toLowerCase().includes("إيميل") || k.toLowerCase().includes("بريد")).map(([k, v]) => (
-              <div key={k} className="admin-detail-modal-info-value" dir="ltr" style={{ textAlign: "left" }}>{String(v)}</div>
+              <div key={k} className="admin-detail-modal-info-value" dir="ltr" style={{ textAlign: "left", display: "flex", alignItems: "center", gap: "8px", justifyContent: "flex-end" }}>
+                {String(v)}
+                <button 
+                  onClick={() => handleCopy(String(v))}
+                  className="admin-icon-btn" 
+                  title="نسخ"
+                  style={{ background: "transparent", border: "none", color: copiedText === String(v) ? "#22c55e" : "#9ca3af", cursor: "pointer", padding: "4px" }}
+                >
+                  {copiedText === String(v) ? <CheckCircle2 size={14} /> : <Copy size={14} />}
+                </button>
+              </div>
             ))}
+          </div>
+        )}
+
+        {/* Pricing Breakdown */}
+        {order.totalPrice !== undefined && order.totalPrice > 0 && (
+          <div className="admin-detail-modal-section">
+            <div className="admin-detail-modal-info-label" style={{ marginBottom: "0.5rem" }}><DollarSign size={13} /> تفاصيل التسعير</div>
+            <div className="admin-order-pricing-card">
+              {order.pricingBreakdown && order.pricingBreakdown.length > 0 ? (
+                <>
+                  {order.pricingBreakdown.map((item, i) => (
+                    <div key={i} className="admin-order-pricing-row">
+                      <span className="admin-order-pricing-label">{item.label}</span>
+                      <span className="admin-order-pricing-value">
+                        {formatPriceWithCommas(String(item.value))} {getCurrencySymbol(order.priceCurrency || "USD")}
+                      </span>
+                    </div>
+                  ))}
+                  <div className="admin-order-pricing-divider" />
+                  <div className="admin-order-pricing-row admin-order-pricing-total">
+                    <span className="admin-order-pricing-label">الإجمالي</span>
+                    <span className="admin-order-pricing-value">
+                      {formatPriceWithCommas(String(order.totalPrice))} {getCurrencySymbol(order.priceCurrency || "USD")}
+                    </span>
+                  </div>
+                </>
+              ) : (
+                <div className="admin-order-pricing-row admin-order-pricing-total">
+                  <span className="admin-order-pricing-label">السعر الإجمالي</span>
+                  <span className="admin-order-pricing-value">
+                    {formatPriceWithCommas(String(order.totalPrice))} {getCurrencySymbol(order.priceCurrency || "USD")}
+                  </span>
+                </div>
+              )}
+            </div>
           </div>
         )}
 
@@ -101,20 +160,30 @@ function OrderDetailModal({ order, onClose, onStatusChange, onDelete }: {
           </div>
         )}
 
-        {/* Custom Fields */}
-        {order.customFields && Object.keys(order.customFields).length > 0 && (
-          <div className="admin-detail-modal-section">
-            <div className="admin-detail-modal-info-label" style={{ marginBottom: "0.5rem" }}>📋 الحقول المخصصة</div>
-            <div className="admin-detail-modal-fields">
-              {Object.entries(order.customFields).map(([key, value]) => (
-                <div key={key} className="admin-detail-modal-field">
-                  <span className="admin-detail-modal-field-key">{key}</span>
-                  <span className="admin-detail-modal-field-value">{String(value)}</span>
-                </div>
-              ))}
+        {/* Custom Fields (filter out system fields) */}
+        {order.customFields && (() => {
+          const systemKeys = ["customerName", "customerPhone", "customerNotes"];
+          const customEntries = Object.entries(order.customFields).filter(
+            ([k]) => !systemKeys.includes(k) && 
+                     !k.toLowerCase().includes("email") && 
+                     !k.toLowerCase().includes("إيميل") && 
+                     !k.toLowerCase().includes("بريد")
+          );
+          if (customEntries.length === 0) return null;
+          return (
+            <div className="admin-detail-modal-section">
+              <div className="admin-detail-modal-info-label" style={{ marginBottom: "0.5rem" }}>📋 الحقول المخصصة</div>
+              <div className="admin-order-custom-grid">
+                {customEntries.map(([key, value]) => (
+                  <div key={key} className="admin-order-custom-item">
+                    <span className="admin-order-custom-key">{key}</span>
+                    <span className="admin-order-custom-val">{String(value)}</span>
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
-        )}
+          );
+        })()}
 
         {/* Actions */}
         <div className="admin-detail-modal-actions">
@@ -218,17 +287,53 @@ export function AdminOrders({ onCountChange }: AdminOrdersProps) {
 
   const filteredOrders = filter === "all" ? orders : orders.filter(o => o.status === filter);
 
-  const formatDate = (timestamp: any) => {
-    if (!timestamp) return "—";
-    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
-    return new Intl.DateTimeFormat("ar-IQ", {
-      year: "numeric", month: "short", day: "numeric",
-      hour: "2-digit", minute: "2-digit",
-    }).format(date);
+  const formatDate = formatTimestamp;
+
+  const handleExportCSV = () => {
+    const headers = ["المعرف", "الطلب", "النوع", "اسم العميل", "رقم الجوال", "بريد الحساب", "الحالة", "التاريخ"];
+    const rows = orders.map(o => [
+      o.id || "",
+      o.itemTitle,
+      ITEM_TYPE_LABELS[o.itemType] || o.itemType,
+      o.customerName,
+      o.customerPhone,
+      o.userRegisteredEmail || o.userEmail || "",
+      STATUS_CONFIG[o.status].label,
+      formatDate(o.createdAt)
+    ]);
+    
+    const csvContent = "\uFEFF" + [
+      headers.join(","),
+      ...rows.map(e => e.map(f => `"${String(f).replace(/"/g, '""')}"`).join(","))
+    ].join("\n");
+    
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", `orders_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   return (
     <div>
+      {/* Header Actions */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
+        <h2 style={{ fontSize: "1.25rem", margin: 0 }}>تصفية الطلبات</h2>
+        <button 
+          onClick={handleExportCSV}
+          disabled={orders.length === 0}
+          className="admin-btn-secondary"
+          style={{ padding: "0.5rem 1rem", fontSize: "0.875rem", display: "flex", alignItems: "center", gap: "0.5rem" }}
+        >
+          <Download size={16} />
+          تصدير CSV
+        </button>
+      </div>
+
       {/* Filter Tabs */}
       <div className="admin-order-filters">
         {(["all", "pending", "processing", "completed", "cancelled"] as const).map((f) => {
@@ -295,6 +400,11 @@ export function AdminOrders({ onCountChange }: AdminOrdersProps) {
                 <div className="admin-order-title">
                   <Package size={16} />
                   {order.itemTitle}
+                  {order.totalPrice !== undefined && order.totalPrice > 0 && (
+                    <span className="admin-order-price-badge">
+                      {formatPriceWithCommas(String(order.totalPrice))} {getCurrencySymbol(order.priceCurrency || "USD")}
+                    </span>
+                  )}
                 </div>
                 <div className="admin-order-customer">
                   <div className="admin-order-customer-item">

@@ -1,6 +1,6 @@
-import { useState } from "react";
-import { CheckCircle2, Sparkles, Send, Minus, Plus, Image, User, Phone, FileText } from "lucide-react";
-import { FormField, ServiceData, PackageData, formatDisplayPrice, formatPriceWithCommas } from "../../lib/firebase";
+import { useState, useMemo } from "react";
+import { CheckCircle2, Sparkles, Send, Minus, Plus, Image, User, Phone, FileText, DollarSign, ChevronDown, Check } from "lucide-react";
+import { FormField, ServiceData, PackageData, Currency, formatDisplayPrice, formatPriceWithCommas, getCurrencySymbol } from "../../lib/firebase";
 
 interface ServicePreviewProps {
   mode: "service";
@@ -16,9 +16,151 @@ interface PackagePreviewProps {
 
 type LivePreviewProps = ServicePreviewProps | PackagePreviewProps;
 
-function FormPreview({ fields, title }: { fields: FormField[]; title: string }) {
-  // Interactive state for each field
+// Mini Custom Dropdown for Preview
+function PreviewDropdown({
+  field,
+  value,
+  onChange,
+}: {
+  field: FormField;
+  value: string;
+  onChange: (val: string) => void;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const options = field.options || [];
+  const hasPricing = field.pricingEnabled && field.pricingMode === "options_map";
+  const currency = field.priceCurrency || "USD";
+
+  return (
+    <div style={{ position: "relative", width: "100%" }}>
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        style={{
+          width: "100%",
+          padding: "0.55rem 0.75rem",
+          borderRadius: "0.6rem",
+          background: "rgba(0,0,0,0.5)",
+          border: `1px solid rgba(255,255,255,${isOpen ? "0.2" : "0.08"})`,
+          color: value ? "#fff" : "#555",
+          fontSize: "0.8rem",
+          fontWeight: 600,
+          textAlign: "right",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: "0.5rem",
+          fontFamily: "inherit",
+          transition: "all 0.2s ease",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flex: 1, minWidth: 0 }}>
+          <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1 }}>
+            {value || field.placeholder || "اختر..."}
+          </span>
+          {hasPricing && value && field.optionPrices?.[value] !== undefined && (
+            <span style={{
+              fontSize: "0.7rem", fontWeight: 800, color: "#4ade80",
+              background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.2)",
+              padding: "0.1rem 0.4rem", borderRadius: "0.3rem", whiteSpace: "nowrap", flexShrink: 0,
+            }}>
+              {formatPriceWithCommas(String(field.optionPrices[value]))} {getCurrencySymbol(currency)}
+            </span>
+          )}
+        </div>
+        <ChevronDown size={14} style={{ color: "#666", transform: isOpen ? "rotate(180deg)" : "none", transition: "transform 0.2s", flexShrink: 0 }} />
+      </button>
+
+      {isOpen && (
+        <div style={{
+          position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, zIndex: 50,
+          background: "rgba(15,15,15,0.98)", backdropFilter: "blur(12px)",
+          border: "1px solid rgba(255,255,255,0.1)", borderRadius: "0.6rem",
+          overflow: "hidden", boxShadow: "0 8px 30px rgba(0,0,0,0.5)",
+          maxHeight: "160px", overflowY: "auto",
+        }}>
+          {options.map((opt, i) => {
+            const optPrice = hasPricing && field.optionPrices?.[opt] !== undefined ? field.optionPrices[opt] : null;
+            const isSelected = value === opt;
+            return (
+              <button key={i} type="button"
+                onClick={() => { onChange(opt); setIsOpen(false); }}
+                style={{
+                  width: "100%", padding: "0.5rem 0.75rem",
+                  display: "flex", alignItems: "center", justifyContent: "space-between", gap: "0.4rem",
+                  fontFamily: "inherit", fontSize: "0.78rem", fontWeight: 600,
+                  color: isSelected ? "#fff" : "#ccc", textAlign: "right",
+                  background: isSelected ? "rgba(255,255,255,0.06)" : "transparent",
+                  borderBottom: i < options.length - 1 ? "1px solid rgba(255,255,255,0.04)" : "none",
+                  transition: "background 0.15s",
+                }}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.06)"; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = isSelected ? "rgba(255,255,255,0.06)" : "transparent"; }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flex: 1, minWidth: 0 }}>
+                  <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1 }}>{opt}</span>
+                  {optPrice !== null && (
+                    <span style={{
+                      fontSize: "0.68rem", fontWeight: 800, color: "#4ade80",
+                      background: "rgba(34,197,94,0.08)", padding: "0.05rem 0.35rem",
+                      borderRadius: "0.25rem", whiteSpace: "nowrap", flexShrink: 0,
+                    }}>
+                      {formatPriceWithCommas(String(optPrice))} {getCurrencySymbol(currency)}
+                    </span>
+                  )}
+                </div>
+                {isSelected && <Check size={12} style={{ color: "#4ade80", flexShrink: 0 }} />}
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Price breakdown for preview
+function PreviewPriceBar({ breakdown, total, currency }: { breakdown: { label: string; value: number }[]; total: number; currency: Currency }) {
+  if (breakdown.length === 0 && total === 0) return null;
+  const sym = getCurrencySymbol(currency);
+  return (
+    <div style={{
+      margin: "0.75rem 0", borderRadius: "0.65rem", overflow: "hidden",
+      background: "rgba(34,197,94,0.04)", border: "1px solid rgba(34,197,94,0.15)",
+    }}>
+      <div style={{
+        display: "flex", alignItems: "center", gap: "0.3rem",
+        padding: "0.45rem 0.65rem", fontSize: "0.7rem", fontWeight: 800,
+        color: "#4ade80", background: "rgba(34,197,94,0.06)",
+        borderBottom: "1px solid rgba(34,197,94,0.1)",
+      }}>
+        <DollarSign size={12} />
+        <span>ملخص التسعير</span>
+      </div>
+      <div style={{ padding: "0.45rem 0.65rem", display: "flex", flexDirection: "column", gap: "0.3rem" }}>
+        {breakdown.map((item, i) => (
+          <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <span style={{ fontSize: "0.7rem", fontWeight: 600, color: "#aaa", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{item.label}</span>
+            <span style={{ fontSize: "0.7rem", fontWeight: 800, color: "#4ade80", whiteSpace: "nowrap" }}>{formatPriceWithCommas(String(item.value))} {sym}</span>
+          </div>
+        ))}
+        {breakdown.length > 0 && (
+          <>
+            <div style={{ height: "1px", background: "linear-gradient(to left, transparent, rgba(34,197,94,0.2), transparent)", margin: "0.1rem 0" }} />
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: "0.2rem" }}>
+              <span style={{ fontSize: "0.8rem", fontWeight: 900, color: "#fff" }}>الإجمالي</span>
+              <span style={{ fontSize: "0.85rem", fontWeight: 800, color: "#4ade80", textShadow: "0 0 8px rgba(34,197,94,0.3)" }}>{formatPriceWithCommas(String(total))} {sym}</span>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function FormPreview({ fields, title, basePrice, baseCurrency }: { fields: FormField[]; title: string; basePrice?: number; baseCurrency?: Currency }) {
   const [fieldValues, setFieldValues] = useState<Record<string, any>>({});
+  const currency = baseCurrency || "USD";
 
   const getValue = (fieldId: string, defaultVal: any = "") => {
     return fieldValues[fieldId] ?? defaultVal;
@@ -27,6 +169,55 @@ function FormPreview({ fields, title }: { fields: FormField[]; title: string }) 
   const setValue = (fieldId: string, val: any) => {
     setFieldValues((prev) => ({ ...prev, [fieldId]: val }));
   };
+
+  const visibleFields = fields.filter(f => !f.deleted);
+
+  // Dynamic pricing calculation
+  const { breakdown, total, hasPricing } = useMemo(() => {
+    const items: { label: string; value: number }[] = [];
+    let runningTotal = 0;
+    let anyPricing = false;
+
+    if (basePrice && basePrice > 0 && !isNaN(basePrice)) {
+      items.push({ label: title || "السعر الأساسي", value: basePrice });
+      runningTotal += basePrice;
+      anyPricing = true;
+    }
+
+    for (const field of visibleFields) {
+      if (!field.pricingEnabled) continue;
+      const val = fieldValues[field.id];
+
+      if (field.pricingMode === "options_map" && field.type === "select") {
+        if (val && field.optionPrices?.[val] !== undefined) {
+          const price = field.optionPrices[val];
+          if (price > 0) {
+            items.push({ label: `${field.label}: ${val}`, value: price });
+            runningTotal += price;
+            anyPricing = true;
+          }
+        }
+      } else if (field.pricingMode === "per_unit") {
+        const qty = Number(val) || 0;
+        const unitPrice = field.pricePerUnit || 0;
+        if (qty > 0 && unitPrice > 0) {
+          const itemTotal = qty * unitPrice;
+          items.push({ label: `${field.label}: ${qty} × ${formatPriceWithCommas(String(unitPrice))}`, value: itemTotal });
+          runningTotal += itemTotal;
+          anyPricing = true;
+        }
+      } else if (field.pricingMode === "fixed") {
+        const fixedP = field.fixedPrice || 0;
+        if (fixedP > 0 && val) {
+          items.push({ label: field.label, value: fixedP });
+          runningTotal += fixedP;
+          anyPricing = true;
+        }
+      }
+    }
+
+    return { breakdown: items, total: runningTotal, hasPricing: anyPricing };
+  }, [fieldValues, visibleFields, basePrice, title]);
 
   return (
     <div className="preview-form">
@@ -68,7 +259,7 @@ function FormPreview({ fields, title }: { fields: FormField[]; title: string }) 
       </div>
 
       {/* Dynamic Fields */}
-      {fields.filter(f => !f.deleted).map((field) => (
+      {visibleFields.map((field) => (
         <div className="preview-form-field" key={field.id}>
           <label>
             {field.label || "اسم الحقل"} {field.required && <span style={{ color: "#f87171" }}>*</span>}
@@ -117,15 +308,23 @@ function FormPreview({ fields, title }: { fields: FormField[]; title: string }) 
           )}
 
           {field.type === "number" && (
-            <input
-              type="number"
-              placeholder={field.placeholder || "0"}
-              value={getValue(field.id)}
-              onChange={(e) => setValue(field.id, e.target.value)}
-              min={field.min}
-              max={field.max}
-              step={field.step ?? 1}
-            />
+            <div>
+              <input
+                type="number"
+                placeholder={field.placeholder || "0"}
+                value={getValue(field.id)}
+                onChange={(e) => setValue(field.id, e.target.value)}
+                min={field.min}
+                max={field.max}
+                step={field.step ?? 1}
+              />
+              {field.pricingEnabled && field.pricingMode === "per_unit" && field.pricePerUnit && (
+                <div style={{ marginTop: "0.25rem", fontSize: "0.65rem", color: "#555", fontWeight: 600, display: "flex", alignItems: "center", gap: "0.25rem" }}>
+                  <DollarSign size={10} />
+                  سعر الوحدة: {formatPriceWithCommas(String(field.pricePerUnit))} {getCurrencySymbol(field.priceCurrency || currency)}
+                </div>
+              )}
+            </div>
           )}
 
           {field.type === "counter" && (() => {
@@ -133,23 +332,45 @@ function FormPreview({ fields, title }: { fields: FormField[]; title: string }) 
             const max = field.max ?? 999;
             const step = field.step ?? 1;
             const val = Number(getValue(field.id, min));
+            const hasUnitPrice = field.pricingEnabled && field.pricingMode === "per_unit" && field.pricePerUnit;
+            const unitPrice = field.pricePerUnit || 0;
+            const lineTotal = val * unitPrice;
+
             return (
-              <div className="preview-form-counter">
-                <button
-                  type="button"
-                  onClick={() => setValue(field.id, Math.max(min, val - step))}
-                  style={{ opacity: val <= min ? 0.4 : 1 }}
-                >
-                  <Minus size={14} />
-                </button>
-                <span>{val}</span>
-                <button
-                  type="button"
-                  onClick={() => setValue(field.id, Math.min(max, val + step))}
-                  style={{ opacity: val >= max ? 0.4 : 1 }}
-                >
-                  <Plus size={14} />
-                </button>
+              <div>
+                <div className="preview-form-counter">
+                  <button
+                    type="button"
+                    onClick={() => setValue(field.id, Math.max(min, val - step))}
+                    style={{ opacity: val <= min ? 0.4 : 1 }}
+                  >
+                    <Minus size={14} />
+                  </button>
+                  <span>{val}</span>
+                  <button
+                    type="button"
+                    onClick={() => setValue(field.id, Math.min(max, val + step))}
+                    style={{ opacity: val >= max ? 0.4 : 1 }}
+                  >
+                    <Plus size={14} />
+                  </button>
+                  {hasUnitPrice && lineTotal > 0 && (
+                    <span style={{
+                      marginRight: "auto", fontSize: "0.72rem", fontWeight: 800,
+                      color: "#4ade80", background: "rgba(34,197,94,0.1)",
+                      border: "1px solid rgba(34,197,94,0.2)",
+                      padding: "0.15rem 0.45rem", borderRadius: "0.35rem",
+                    }}>
+                      {formatPriceWithCommas(String(lineTotal))} {getCurrencySymbol(field.priceCurrency || currency)}
+                    </span>
+                  )}
+                </div>
+                {hasUnitPrice && (
+                  <div style={{ marginTop: "0.25rem", fontSize: "0.65rem", color: "#555", fontWeight: 600, display: "flex", alignItems: "center", gap: "0.25rem" }}>
+                    <DollarSign size={10} />
+                    سعر الوحدة: {formatPriceWithCommas(String(unitPrice))} {getCurrencySymbol(field.priceCurrency || currency)}
+                  </div>
+                )}
               </div>
             );
           })()}
@@ -159,6 +380,9 @@ function FormPreview({ fields, title }: { fields: FormField[]; title: string }) 
             const max = field.max ?? 100;
             const step = field.step ?? 1;
             const val = Number(getValue(field.id, Math.round((min + max) / 2)));
+            const hasUnitPrice = field.pricingEnabled && field.pricingMode === "per_unit" && field.pricePerUnit;
+            const lineTotal = val * (field.pricePerUnit || 0);
+
             return (
               <div>
                 <input
@@ -175,6 +399,18 @@ function FormPreview({ fields, title }: { fields: FormField[]; title: string }) 
                   <span style={{ color: "#fff", fontWeight: 700, fontSize: "0.85rem" }}>{val}</span>
                   <span>{max}</span>
                 </div>
+                {hasUnitPrice && lineTotal > 0 && (
+                  <div style={{ marginTop: "0.35rem", textAlign: "center" }}>
+                    <span style={{
+                      fontSize: "0.72rem", fontWeight: 800,
+                      color: "#4ade80", background: "rgba(34,197,94,0.1)",
+                      border: "1px solid rgba(34,197,94,0.2)",
+                      padding: "0.15rem 0.5rem", borderRadius: "0.35rem",
+                    }}>
+                      = {formatPriceWithCommas(String(lineTotal))} {getCurrencySymbol(field.priceCurrency || currency)}
+                    </span>
+                  </div>
+                )}
               </div>
             );
           })()}
@@ -195,27 +431,33 @@ function FormPreview({ fields, title }: { fields: FormField[]; title: string }) 
           )}
 
           {field.type === "select" && (
-            <select
+            <PreviewDropdown
+              field={field}
               value={getValue(field.id, "")}
-              onChange={(e) => setValue(field.id, e.target.value)}
-            >
-              <option value="" disabled>
-                {field.placeholder || "اختر..."}
-              </option>
-              {(field.options || []).map((opt, i) => (
-                <option key={i} value={opt}>
-                  {opt}
-                </option>
-              ))}
-            </select>
+              onChange={(val) => setValue(field.id, val)}
+            />
           )}
         </div>
       ))}
+
+      {/* Price Breakdown */}
+      {hasPricing && (
+        <PreviewPriceBar breakdown={breakdown} total={total} currency={currency} />
+      )}
 
       {/* Submit button */}
       <div className="preview-form-submit">
         <Send size={16} />
         <span>تأكيد الطلب</span>
+        {hasPricing && total > 0 && (
+          <span style={{
+            marginRight: "auto", fontSize: "0.7rem", fontWeight: 800,
+            background: "rgba(0,0,0,0.15)", padding: "0.15rem 0.45rem",
+            borderRadius: "0.3rem",
+          }}>
+            {formatPriceWithCommas(String(total))} {getCurrencySymbol(currency)}
+          </span>
+        )}
       </div>
     </div>
   );
@@ -225,6 +467,7 @@ export function LivePreview(props: LivePreviewProps) {
   if (props.mode === "service") {
     const { data, showForm } = props;
     const displayPrice = formatDisplayPrice(data.price, data.currency);
+    const basePrice = data.price ? parseFloat(data.price) : undefined;
 
     if (showForm) {
       return (
@@ -234,7 +477,7 @@ export function LivePreview(props: LivePreviewProps) {
             معاينة نموذج الطلب — تفاعلية
           </div>
           <div className="admin-preview-body">
-            <FormPreview fields={data.orderFormFields} title={data.title} />
+            <FormPreview fields={data.orderFormFields} title={data.title} basePrice={basePrice} baseCurrency={data.currency} />
           </div>
         </div>
       );
@@ -281,6 +524,7 @@ export function LivePreview(props: LivePreviewProps) {
   const displayPrice = formatDisplayPrice(data.price, data.currency);
   const bgColor = data.bgColor || "#000";
   const accentColor = data.accentColor || "#fff";
+  const basePrice = data.price ? parseFloat(data.price) : undefined;
 
   if (showForm) {
     return (
@@ -290,7 +534,7 @@ export function LivePreview(props: LivePreviewProps) {
           معاينة نموذج الطلب — تفاعلية
         </div>
         <div className="admin-preview-body">
-          <FormPreview fields={data.orderFormFields} title={data.title} />
+          <FormPreview fields={data.orderFormFields} title={data.title} basePrice={basePrice} baseCurrency={data.currency} />
         </div>
       </div>
     );

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { MessageCircle, Loader2, Mail, MailOpen, Phone, User, Clock, Trash2, CheckCheck, X } from "lucide-react";
-import { MessageData, getMessages, markMessageRead, deleteMessage } from "../../lib/firebase";
+import { MessageCircle, Loader2, Mail, MailOpen, Phone, User, Clock, Trash2, CheckCheck, X, Download, Copy, CheckCircle2 } from "lucide-react";
+import { MessageData, getMessages, markMessageRead, deleteMessage, formatTimestamp } from "../../lib/firebase";
 
 interface AdminMessagesProps {
   onCountChange?: (count: number) => void;
@@ -15,13 +15,13 @@ function MessageDetailModal({ msg, onClose, onToggleRead, onDelete }: {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
-  const formatDate = (timestamp: any) => {
-    if (!timestamp) return "—";
-    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
-    return new Intl.DateTimeFormat("ar-IQ", {
-      year: "numeric", month: "short", day: "numeric",
-      hour: "2-digit", minute: "2-digit",
-    }).format(date);
+  const formatDate = formatTimestamp;
+  const [copiedText, setCopiedText] = useState<string | null>(null);
+
+  const handleCopy = (text: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedText(text);
+    setTimeout(() => setCopiedText(null), 2000);
   };
 
   return (
@@ -168,14 +168,8 @@ export function AdminMessages({ onCountChange }: AdminMessagesProps) {
     }
   };
 
-  const formatDate = (timestamp: any) => {
-    if (!timestamp) return "—";
-    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
-    return new Intl.DateTimeFormat("ar-IQ", {
-      year: "numeric", month: "short", day: "numeric",
-      hour: "2-digit", minute: "2-digit",
-    }).format(date);
-  };
+  const formatDate = formatTimestamp;
+
 
   const filteredMessages = filter === "all"
     ? messages
@@ -186,8 +180,49 @@ export function AdminMessages({ onCountChange }: AdminMessagesProps) {
   const unreadCount = messages.filter(m => !m.read).length;
   const readCount = messages.filter(m => m.read).length;
 
+  const handleExportCSV = () => {
+    const headers = ["الاسم", "رقم التواصل", "البريد الإلكتروني", "الحالة", "التاريخ", "الرسالة"];
+    const rows = messages.map(m => [
+      m.name,
+      m.phone,
+      m.email,
+      m.read ? "مقروءة" : "غير مقروءة",
+      formatDate(m.createdAt),
+      m.message
+    ]);
+    
+    const csvContent = "\uFEFF" + [
+      headers.join(","),
+      ...rows.map(e => e.map(f => `"${String(f).replace(/"/g, '""')}"`).join(","))
+    ].join("\n");
+    
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", `messages_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div>
+      {/* Header Actions */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
+        <h2 style={{ fontSize: "1.25rem", margin: 0 }}>تصفية الرسائل</h2>
+        <button 
+          onClick={handleExportCSV}
+          disabled={messages.length === 0}
+          className="admin-btn-secondary"
+          style={{ padding: "0.5rem 1rem", fontSize: "0.875rem", display: "flex", alignItems: "center", gap: "0.5rem" }}
+        >
+          <Download size={16} />
+          تصدير CSV
+        </button>
+      </div>
+
       {/* Filter Tabs */}
       <div className="admin-order-filters">
         {([

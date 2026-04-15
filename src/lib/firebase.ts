@@ -125,6 +125,11 @@ export async function getAllGuests(): Promise<GuestSession[]> {
   return snapshot.docs.map((d) => d.data() as GuestSession);
 }
 
+// ============ Constants ============
+
+/** Admin UID — only this user can access the admin panel */
+export const ADMIN_UID = "1kxnlTP7AlZvFwc82E546aNFX8j2";
+
 // ============ Types ============
 
 export interface FormField {
@@ -138,6 +143,14 @@ export interface FormField {
   step?: number;
   options?: string[];
   system?: boolean;
+  deleted?: boolean;
+  // === Dynamic Pricing ===
+  pricingEnabled?: boolean;
+  pricingMode?: "fixed" | "per_unit" | "options_map";
+  fixedPrice?: number;
+  pricePerUnit?: number;
+  optionPrices?: Record<string, number>;
+  priceCurrency?: Currency;
 }
 
 export function ensureSystemFields(fields: FormField[] = []): FormField[] {
@@ -234,6 +247,9 @@ export interface OrderData {
   userId?: string;
   userEmail?: string;
   userRegisteredEmail?: string;
+  totalPrice?: number;
+  priceCurrency?: Currency;
+  pricingBreakdown?: { label: string; value: number }[];
   createdAt?: Timestamp;
 }
 
@@ -465,6 +481,19 @@ export async function saveServiceTypes(types: string[]) {
 
 export function generateFieldId(): string {
   return "field_" + Math.random().toString(36).substring(2, 9);
+}
+
+/** Shared date formatter for Arabic locale — used across admin and frontend */
+export function formatTimestamp(timestamp: any): string {
+  if (!timestamp) return "—";
+  const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+  return new Intl.DateTimeFormat("ar-IQ", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(date);
 }
 
 export function formatPriceWithCommas(value: string): string {

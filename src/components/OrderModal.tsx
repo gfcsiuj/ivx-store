@@ -1,11 +1,12 @@
 import { motion, AnimatePresence } from "motion/react";
-import { X, Send, User, Phone, FileText, CheckCircle2, Sparkles, Minus, Plus, AlertCircle, LogIn } from "lucide-react";
-import React, { useState, useEffect } from "react";
+import { X, Send, User, Phone, FileText, CheckCircle2, Sparkles, Minus, Plus, AlertCircle, LogIn, ChevronDown, Check, DollarSign } from "lucide-react";
+import React, { useState, useEffect, useMemo } from "react";
 import { createPortal } from "react-dom";
-import { FormField, addOrder, ensureSystemFields } from "../lib/firebase";
+import { FormField, Currency, addOrder, ensureSystemFields, formatPriceWithCommas, getCurrencySymbol } from "../lib/firebase";
 import { useAuth } from "../lib/AuthContext";
 import { UserAuthModal } from "./UserAuthModal";
 import { useDevicePerformance } from "../lib/useDevicePerformance";
+import { useBodyLock } from "../lib/useBodyLock";
 
 interface OrderModalProps {
   isOpen: boolean;
@@ -13,9 +14,156 @@ interface OrderModalProps {
   selectedItem: string;
   formFields?: FormField[];
   itemType?: "service" | "package" | "offer";
+  basePrice?: number;
+  baseCurrency?: Currency;
 }
 
-export function OrderModal({ isOpen, onClose, selectedItem, formFields, itemType = "service" }: OrderModalProps) {
+// Custom Dropdown Component
+function CustomDropdown({
+  field,
+  value,
+  onChange,
+}: {
+  field: FormField;
+  value: string;
+  onChange: (val: string) => void;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = React.useRef<HTMLDivElement>(null);
+  const options = field.options || [];
+  const hasPricing = field.pricingEnabled && field.pricingMode === "options_map";
+  const currency = field.priceCurrency || "USD";
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const selectedLabel = value || field.placeholder || "اختر...";
+  const selectedPrice = hasPricing && value && field.optionPrices?.[value] !== undefined
+    ? field.optionPrices[value]
+    : null;
+
+  return (
+    <div className="order-custom-dropdown" ref={dropdownRef}>
+      <button
+        type="button"
+        className={`order-dropdown-trigger ${isOpen ? "open" : ""} ${value ? "has-value" : ""}`}
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        <div className="order-dropdown-trigger-content">
+          <span className={`order-dropdown-trigger-text ${!value ? "placeholder" : ""}`}>
+            {selectedLabel}
+          </span>
+          {selectedPrice !== null && (
+            <span className="order-dropdown-trigger-price">
+              {formatPriceWithCommas(String(selectedPrice))} {getCurrencySymbol(currency)}
+            </span>
+          )}
+        </div>
+        <ChevronDown size={16} className={`order-dropdown-arrow ${isOpen ? "rotated" : ""}`} />
+      </button>
+
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -8, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -8, scale: 0.96 }}
+            transition={{ duration: 0.2 }}
+            className="order-dropdown-menu"
+          >
+            {options.map((opt, i) => {
+              const optPrice = hasPricing && field.optionPrices?.[opt] !== undefined
+                ? field.optionPrices[opt]
+                : null;
+              const isSelected = value === opt;
+
+              return (
+                <button
+                  key={i}
+                  type="button"
+                  className={`order-dropdown-option ${isSelected ? "selected" : ""}`}
+                  onClick={() => {
+                    onChange(opt);
+                    setIsOpen(false);
+                  }}
+                >
+                  <div className="order-dropdown-option-content">
+                    <span className="order-dropdown-option-label">{opt}</span>
+                    {optPrice !== null && (
+                      <span className="order-dropdown-option-price">
+                        {formatPriceWithCommas(String(optPrice))} {getCurrencySymbol(currency)}
+                      </span>
+                    )}
+                  </div>
+                  {isSelected && (
+                    <Check size={14} className="order-dropdown-option-check" />
+                  )}
+                </button>
+              );
+            })}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+// Price Breakdown Bar
+function PriceBreakdown({
+  breakdown,
+  total,
+  currency,
+}: {
+  breakdown: { label: string; value: number }[];
+  total: number;
+  currency: Currency;
+}) {
+  if (breakdown.length === 0 && total === 0) return null;
+  const sym = getCurrencySymbol(currency);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="order-price-breakdown"
+    >
+      <div className="order-price-breakdown-header">
+        <DollarSign size={14} />
+        <span>ملخص التسعير</span>
+      </div>
+      <div className="order-price-breakdown-body">
+        {breakdown.map((item, i) => (
+          <div key={i} className="order-price-breakdown-row">
+            <span className="order-price-breakdown-label">{item.label}</span>
+            <span className="order-price-breakdown-value">
+              {formatPriceWithCommas(String(item.value))} {sym}
+            </span>
+          </div>
+        ))}
+        {breakdown.length > 0 && (
+          <>
+            <div className="order-price-breakdown-divider" />
+            <div className="order-price-breakdown-row total">
+              <span className="order-price-breakdown-label">الإجمالي</span>
+              <span className="order-price-breakdown-value">
+                {formatPriceWithCommas(String(total))} {sym}
+              </span>
+            </div>
+          </>
+        )}
+      </div>
+    </motion.div>
+  );
+}
+
+export function OrderModal({ isOpen, onClose, selectedItem, formFields, itemType = "service", basePrice, baseCurrency = "USD" }: OrderModalProps) {
   const { isLowEnd } = useDevicePerformance();
   const { user } = useAuth();
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -32,9 +180,10 @@ export function OrderModal({ isOpen, onClose, selectedItem, formFields, itemType
     setMounted(true);
   }, []);
 
+  useBodyLock(isOpen);
+
   useEffect(() => {
     if (isOpen) {
-      document.body.style.overflow = 'hidden';
       document.body.classList.add('modal-open');
       // Reset form
       setCustomFieldValues({});
@@ -42,11 +191,9 @@ export function OrderModal({ isOpen, onClose, selectedItem, formFields, itemType
       setIsError(false);
       setValidationError("");
     } else {
-      document.body.style.overflow = 'unset';
       document.body.classList.remove('modal-open');
     }
     return () => {
-      document.body.style.overflow = 'unset';
       document.body.classList.remove('modal-open');
     };
   }, [isOpen]);
@@ -60,6 +207,56 @@ export function OrderModal({ isOpen, onClose, selectedItem, formFields, itemType
   };
 
   const hasCustomFields = fieldsToRender.length > 0;
+
+  // Dynamic pricing calculation
+  const { breakdown, total, hasPricing } = useMemo(() => {
+    const items: { label: string; value: number }[] = [];
+    let runningTotal = 0;
+    let anyPricing = false;
+
+    // Base price
+    if (basePrice && basePrice > 0) {
+      items.push({ label: selectedItem || "السعر الأساسي", value: basePrice });
+      runningTotal += basePrice;
+      anyPricing = true;
+    }
+
+    // Iterate through fields with pricing
+    for (const field of fieldsToRender) {
+      if (!field.pricingEnabled) continue;
+
+      const val = customFieldValues[field.id];
+
+      if (field.pricingMode === "options_map" && field.type === "select") {
+        if (val && field.optionPrices?.[val] !== undefined) {
+          const price = field.optionPrices[val];
+          if (price > 0) {
+            items.push({ label: `${field.label}: ${val}`, value: price });
+            runningTotal += price;
+            anyPricing = true;
+          }
+        }
+      } else if (field.pricingMode === "per_unit") {
+        const qty = Number(val) || 0;
+        const unitPrice = field.pricePerUnit || 0;
+        if (qty > 0 && unitPrice > 0) {
+          const itemTotal = qty * unitPrice;
+          items.push({ label: `${field.label}: ${qty} × ${formatPriceWithCommas(String(unitPrice))}`, value: itemTotal });
+          runningTotal += itemTotal;
+          anyPricing = true;
+        }
+      } else if (field.pricingMode === "fixed") {
+        const fixedP = field.fixedPrice || 0;
+        if (fixedP > 0 && val) {
+          items.push({ label: field.label, value: fixedP });
+          runningTotal += fixedP;
+          anyPricing = true;
+        }
+      }
+    }
+
+    return { breakdown: items, total: runningTotal, hasPricing: anyPricing };
+  }, [customFieldValues, fieldsToRender, basePrice, selectedItem]);
 
   const validateForm = (): boolean => {
     for (const field of fieldsToRender) {
@@ -91,6 +288,11 @@ export function OrderModal({ isOpen, onClose, selectedItem, formFields, itemType
         customerNotes: customFieldValues["customerNotes"] || "",
         customFields: customFieldValues,
         status: "pending",
+        ...(hasPricing ? {
+          totalPrice: total,
+          priceCurrency: baseCurrency,
+          pricingBreakdown: breakdown,
+        } : {}),
       });
       setIsSubmitting(false);
       setIsSuccess(true);
@@ -289,17 +491,25 @@ export function OrderModal({ isOpen, onClose, selectedItem, formFields, itemType
                           )}
 
                           {field.type === "number" && (
-                            <input
-                              type="number"
-                              required={field.required}
-                              placeholder={field.placeholder || "0"}
-                              value={getFieldValue(field.id)}
-                              onChange={(e) => { setFieldValue(field.id, e.target.value); setValidationError(""); }}
-                              min={field.min}
-                              max={field.max}
-                              step={field.step ?? 1}
-                              className="w-full px-4 py-3 md:py-4 bg-black/50 border border-gray-800 rounded-xl md:rounded-2xl focus:ring-2 focus:ring-white/20 focus:border-white outline-none transition-all shadow-sm backdrop-blur-sm text-white font-medium text-sm md:text-base placeholder-gray-600"
-                            />
+                            <div>
+                              <input
+                                type="number"
+                                required={field.required}
+                                placeholder={field.placeholder || "0"}
+                                value={getFieldValue(field.id)}
+                                onChange={(e) => { setFieldValue(field.id, e.target.value); setValidationError(""); }}
+                                min={field.min}
+                                max={field.max}
+                                step={field.step ?? 1}
+                                className="w-full px-4 py-3 md:py-4 bg-black/50 border border-gray-800 rounded-xl md:rounded-2xl focus:ring-2 focus:ring-white/20 focus:border-white outline-none transition-all shadow-sm backdrop-blur-sm text-white font-medium text-sm md:text-base placeholder-gray-600"
+                              />
+                              {field.pricingEnabled && field.pricingMode === "per_unit" && field.pricePerUnit && (
+                                <div className="mt-1.5 text-xs text-gray-500 font-arabic font-medium flex items-center gap-1.5">
+                                  <DollarSign size={11} />
+                                  سعر الوحدة: {formatPriceWithCommas(String(field.pricePerUnit))} {getCurrencySymbol(field.priceCurrency || baseCurrency)}
+                                </div>
+                              )}
+                            </div>
                           )}
 
                           {field.type === "counter" && (() => {
@@ -307,23 +517,42 @@ export function OrderModal({ isOpen, onClose, selectedItem, formFields, itemType
                             const max = field.max ?? 999;
                             const step = field.step ?? 1;
                             const val = Number(getFieldValue(field.id, min));
+                            const hasUnitPrice = field.pricingEnabled && field.pricingMode === "per_unit" && field.pricePerUnit;
+                            const unitPrice = field.pricePerUnit || 0;
+                            const lineTotal = val * unitPrice;
+
                             return (
-                              <div className="flex items-center gap-4">
-                                <button
-                                  type="button"
-                                  onClick={() => setFieldValue(field.id, Math.max(min, val - step))}
-                                  className="w-10 h-10 rounded-xl bg-white/10 border border-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-all"
-                                >
-                                  <Minus size={16} />
-                                </button>
-                                <span className="text-xl font-black text-white min-w-[3rem] text-center">{val}</span>
-                                <button
-                                  type="button"
-                                  onClick={() => setFieldValue(field.id, Math.min(max, val + step))}
-                                  className="w-10 h-10 rounded-xl bg-white/10 border border-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-all"
-                                >
-                                  <Plus size={16} />
-                                </button>
+                              <div>
+                                <div className="flex items-center gap-4">
+                                  <button
+                                    type="button"
+                                    onClick={() => setFieldValue(field.id, Math.max(min, val - step))}
+                                    className="w-10 h-10 rounded-xl bg-white/10 border border-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-all"
+                                  >
+                                    <Minus size={16} />
+                                  </button>
+                                  <span className="text-xl font-black text-white min-w-[3rem] text-center">{val}</span>
+                                  <button
+                                    type="button"
+                                    onClick={() => setFieldValue(field.id, Math.min(max, val + step))}
+                                    className="w-10 h-10 rounded-xl bg-white/10 border border-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-all"
+                                  >
+                                    <Plus size={16} />
+                                  </button>
+                                  {hasUnitPrice && lineTotal > 0 && (
+                                    <div className="mr-auto bg-emerald-500/10 border border-emerald-500/20 rounded-lg px-3 py-1.5">
+                                      <span className="text-sm font-bold text-emerald-400 font-arabic">
+                                        {formatPriceWithCommas(String(lineTotal))} {getCurrencySymbol(field.priceCurrency || baseCurrency)}
+                                      </span>
+                                    </div>
+                                  )}
+                                </div>
+                                {hasUnitPrice && (
+                                  <div className="mt-1.5 text-xs text-gray-500 font-arabic font-medium flex items-center gap-1.5">
+                                    <DollarSign size={11} />
+                                    سعر الوحدة: {formatPriceWithCommas(String(unitPrice))} {getCurrencySymbol(field.priceCurrency || baseCurrency)}
+                                  </div>
+                                )}
                               </div>
                             );
                           })()}
@@ -333,6 +562,9 @@ export function OrderModal({ isOpen, onClose, selectedItem, formFields, itemType
                             const max = field.max ?? 100;
                             const step = field.step ?? 1;
                             const val = Number(getFieldValue(field.id, Math.round((min + max) / 2)));
+                            const hasUnitPrice = field.pricingEnabled && field.pricingMode === "per_unit" && field.pricePerUnit;
+                            const lineTotal = val * (field.pricePerUnit || 0);
+
                             return (
                               <div>
                                 <input
@@ -349,6 +581,13 @@ export function OrderModal({ isOpen, onClose, selectedItem, formFields, itemType
                                   <span className="text-white font-bold text-sm">{val}</span>
                                   <span>{max}</span>
                                 </div>
+                                {hasUnitPrice && lineTotal > 0 && (
+                                  <div className="mt-2 text-center">
+                                    <span className="text-sm font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded-lg px-3 py-1 font-arabic">
+                                      = {formatPriceWithCommas(String(lineTotal))} {getCurrencySymbol(field.priceCurrency || baseCurrency)}
+                                    </span>
+                                  </div>
+                                )}
                               </div>
                             );
                           })()}
@@ -372,20 +611,23 @@ export function OrderModal({ isOpen, onClose, selectedItem, formFields, itemType
                           )}
 
                           {field.type === "select" && (
-                            <select
-                              required={field.required}
+                            <CustomDropdown
+                              field={field}
                               value={getFieldValue(field.id, "")}
-                              onChange={(e) => { setFieldValue(field.id, e.target.value); setValidationError(""); }}
-                              className="w-full px-4 py-3 md:py-4 bg-black/50 border border-gray-800 rounded-xl md:rounded-2xl focus:ring-2 focus:ring-white/20 focus:border-white outline-none transition-all font-arabic shadow-sm backdrop-blur-sm text-white font-medium text-sm md:text-base"
-                            >
-                              <option value="" disabled>{field.placeholder || "اختر..."}</option>
-                              {(field.options || []).map((opt, i) => (
-                                <option key={i} value={opt}>{opt}</option>
-                              ))}
-                            </select>
+                              onChange={(val) => { setFieldValue(field.id, val); setValidationError(""); }}
+                            />
                           )}
                         </div>
                       ))}
+
+                      {/* Dynamic Price Breakdown */}
+                      {hasPricing && (
+                        <PriceBreakdown
+                          breakdown={breakdown}
+                          total={total}
+                          currency={baseCurrency}
+                        />
+                      )}
 
                       <button
                         type="submit"
@@ -398,6 +640,11 @@ export function OrderModal({ isOpen, onClose, selectedItem, formFields, itemType
                           <>
                             <Send size={20} className="md:w-[22px] md:h-[22px]" />
                             <span>تأكيد الطلب</span>
+                            {hasPricing && total > 0 && (
+                              <span className="bg-black/10 rounded-lg px-2 py-0.5 text-sm font-bold">
+                                {formatPriceWithCommas(String(total))} {getCurrencySymbol(baseCurrency)}
+                              </span>
+                            )}
                           </>
                         )}
                       </button>

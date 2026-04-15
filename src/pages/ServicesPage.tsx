@@ -1,11 +1,11 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { useLocation } from "react-router-dom";
 import { PageHero } from "../components/PageHero";
 import { PageLayout } from "../components/PageLayout";
 import { OrderModal } from "../components/OrderModal";
 import { ServiceDetailsModal } from "../components/ServiceDetailsModal";
-import { Filter, Loader2 } from "lucide-react";
+import { Filter, Loader2, Search } from "lucide-react";
 import { ServiceData, getServices, getServiceTypes, formatDisplayPrice } from "../lib/firebase";
 import { Heart } from "lucide-react";
 
@@ -15,6 +15,7 @@ export function ServicesPage() {
   const [adminCats, setAdminCats] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState<string>(location.state?.activeTab || "all");
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     if (location.state?.activeTab) {
@@ -62,8 +63,13 @@ export function ServicesPage() {
   const filteredServices = activeCategory === "all"
     ? services
     : activeCategory === "favorites"
-    ? services.filter((s) => favorites.includes(s.id!))
-    : services.filter((s) => s.type === activeCategory);
+      ? services.filter((s) => favorites.includes(s.id!))
+      : services.filter((s) => s.type === activeCategory);
+
+  const searchedServices = filteredServices.filter(s =>
+    s.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (s.description && s.description.toLowerCase().includes(searchQuery.toLowerCase()))
+  );
 
   const handleOrder = (service: ServiceData, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
@@ -87,13 +93,29 @@ export function ServicesPage() {
 
       <section className="pb-24 md:pb-32 relative z-10" dir="rtl">
         <div className="container mx-auto px-5 md:px-8">
+          {/* Search Bar */}
+          <div className="mb-6 md:mb-10 max-w-xl mx-auto">
+            <div className="relative group">
+              <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
+                <Search className="h-5 w-5 text-gray-400 group-focus-within:text-white transition-colors" />
+              </div>
+              <input
+                type="text"
+                placeholder="ابحث عن خدمة، لعبة، أو اشتراك..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-white/5 border border-white/10 rounded-2xl py-3 md:py-4 pl-4 pr-12 text-white font-arabic placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-white/20 transition-all font-medium text-sm md:text-base outline-none"
+              />
+            </div>
+          </div>
+
           {/* Filter Tabs */}
           {categories.length > 1 && (
             <div className="mb-8 md:mb-14 relative w-full">
               {/* Fade masks for elegant mobile scrolling */}
               <div className="absolute top-0 -right-5 bottom-0 w-12 bg-gradient-to-l from-black via-black/80 to-transparent z-10 md:hidden pointer-events-none" />
               <div className="absolute top-0 -left-5 bottom-0 w-12 bg-gradient-to-r from-black via-black/80 to-transparent z-10 md:hidden pointer-events-none" />
-              
+
               <div className="flex overflow-x-auto md:flex-wrap justify-start md:justify-center gap-2 md:gap-3 snap-x scroll-smooth pb-4 -mx-5 px-5 md:mx-0 md:px-0 md:pb-0 hide-scrollbar" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
                 {categories.map((cat) => {
                   const isActive = activeCategory === cat.id;
@@ -101,16 +123,15 @@ export function ServicesPage() {
                   if (cat.id === "all") count = services.length;
                   else if (cat.id === "favorites") count = services.filter((s) => favorites.includes(s.id!)).length;
                   else count = services.filter((s) => s.type === cat.id).length;
-                  
+
                   return (
                     <button
                       key={cat.id}
                       onClick={() => setActiveCategory(cat.id)}
-                      className={`flex-shrink-0 snap-start flex items-center gap-2 px-4 py-2.5 md:px-6 md:py-3 rounded-full font-arabic font-bold text-xs md:text-sm transition-all duration-300 border ${
-                        isActive
+                      className={`flex-shrink-0 snap-start flex items-center gap-2 px-4 py-2.5 md:px-6 md:py-3 rounded-full font-arabic font-bold text-xs md:text-sm transition-all duration-300 border ${isActive
                           ? "bg-white text-black border-white shadow-[0_0_20px_rgba(255,255,255,0.15)]"
                           : "bg-white/5 text-gray-400 border-white/10 hover:bg-white/10 hover:text-white hover:border-white/20"
-                      }`}
+                        }`}
                     >
                       {cat.id === "all" && <Filter className="w-4 h-4" />}
                       {cat.id === "favorites" && <Heart className={`w-4 h-4 ${isActive ? 'fill-current' : ''}`} />}
@@ -147,18 +168,16 @@ export function ServicesPage() {
             <>
               {/* Services Grid */}
               <motion.div
-                layout
                 className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6"
               >
-                <AnimatePresence mode="popLayout">
-                  {filteredServices.map((service) => (
+                <AnimatePresence mode="sync">
+                  {searchedServices.map((service) => (
                     <motion.div
                       key={service.id}
-                      layout
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.9 }}
-                      transition={{ duration: 0.3 }}
+                      initial={{ opacity: 0, y: 15 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.25, ease: "easeOut" }}
                       onClick={() => handleDetails(service)}
                       className="bg-gray-900/40 border border-white/10 rounded-2xl md:rounded-3xl overflow-hidden hover:border-white/30 transition-all duration-500 group flex flex-col cursor-pointer"
                     >
@@ -227,7 +246,7 @@ export function ServicesPage() {
               </motion.div>
 
               {/* Empty State */}
-              {filteredServices.length === 0 && (
+              {searchedServices.length === 0 && (
                 <div className="text-center py-20">
                   <div className="text-6xl mb-4">🔍</div>
                   <p className="text-gray-400 font-arabic text-lg font-medium">لا توجد خدمات في هذا القسم حالياً</p>
@@ -240,10 +259,12 @@ export function ServicesPage() {
 
       <OrderModal
         isOpen={isModalOpen}
-        onClose={() => { setIsModalOpen(false); if (!detailsModalOpen) setSelectedService(null); }}
+        onClose={() => { setIsModalOpen(false); setSelectedService(null); }}
         selectedItem={selectedService?.title || ""}
         formFields={selectedService?.orderFormFields}
         itemType="service"
+        basePrice={selectedService?.price ? parseFloat(selectedService.price) : undefined}
+        baseCurrency={selectedService?.currency}
       />
 
       <ServiceDetailsModal
@@ -252,8 +273,9 @@ export function ServicesPage() {
         service={selectedService}
         isFavorite={selectedService ? favorites.includes(selectedService.id!) : false}
         toggleFavorite={toggleFavorite}
-        onOrder={() => { 
-          // Open order modal for this service
+        onOrder={() => {
+          // Close details first, then open order — keep selectedService intact
+          setDetailsModalOpen(false);
           setIsModalOpen(true);
         }}
       />

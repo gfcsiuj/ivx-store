@@ -85,6 +85,36 @@
   border-color: rgba(255, 255, 255, 0.2);
 }
 
+.admin-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.admin-header-email {
+  font-size: 0.8rem;
+  color: #666;
+  font-weight: 600;
+}
+
+.admin-back-btn-text {
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .admin-header-email {
+    display: none;
+  }
+  
+  .admin-header-actions {
+    gap: 0.4rem;
+  }
+  
+  .admin-back-btn-text {
+    display: none;
+  }
+}
+
 /* ---------- Tabs ---------- */
 .admin-tabs {
   display: flex;
@@ -2595,4 +2625,721 @@
   color: #fff;
   padding: 0.5rem;
   font-weight: 600;
+}
+
+/* ============================================================
+   Dynamic Pricing — Admin Field Editor
+   ============================================================ */
+
+/* Pricing Badge on field header */
+.admin-field-pricing-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  font-size: 0.6rem;
+  font-weight: 800;
+  padding: 0.15rem 0.45rem;
+  border-radius: 0.3rem;
+  background: rgba(34, 197, 94, 0.15);
+  color: #4ade80;
+  border: 1px solid rgba(34, 197, 94, 0.25);
+  letter-spacing: 0.03em;
+}
+
+/* Pricing Section Container */
+.admin-pricing-section {
+  margin-top: 0.85rem;
+  border: 1px solid rgba(34, 197, 94, 0.12);
+  border-radius: 0.75rem;
+  overflow: hidden;
+  background: rgba(34, 197, 94, 0.03);
+  transition: all 0.3s ease;
+}
+
+.admin-pricing-section:hover {
+  border-color: rgba(34, 197, 94, 0.2);
+}
+
+/* Pricing Header */
+.admin-pricing-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.6rem 0.85rem;
+  background: rgba(34, 197, 94, 0.05);
+  border-bottom: 1px solid rgba(34, 197, 94, 0.08);
+}
+
+.admin-pricing-header-info {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #4ade80;
+}
+
+/* Small toggle variant */
+.admin-toggle-track.small {
+  width: 2.25rem;
+  height: 1.15rem;
+}
+
+.admin-toggle-track.small .admin-toggle-thumb {
+  width: 0.85rem;
+  height: 0.85rem;
+  top: 1.5px;
+  right: 2px;
+}
+
+.admin-toggle-track.small.active .admin-toggle-thumb {
+  right: calc(100% - 0.85rem - 2px);
+}
+
+/* Pricing Body */
+.admin-pricing-body {
+  padding: 0.75rem 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  animation: pricingFadeIn 0.3s ease;
+}
+
+@keyframes pricingFadeIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Pricing Mode Selector */
+.admin-pricing-modes {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.admin-pricing-mode-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.5rem 0.3rem;
+  border-radius: 0.5rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: #666;
+  font-size: 0.7rem;
+  font-weight: 700;
+  font-family: inherit;
+  transition: all 0.3s ease;
+}
+
+.admin-pricing-mode-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #aaa;
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.admin-pricing-mode-btn.active {
+  background: rgba(34, 197, 94, 0.12);
+  color: #4ade80;
+  border-color: rgba(34, 197, 94, 0.3);
+  box-shadow: 0 0 12px rgba(34, 197, 94, 0.1);
+}
+
+.admin-pricing-mode-icon {
+  display: flex;
+  align-items: center;
+}
+
+.admin-pricing-mode-label {
+  white-space: nowrap;
+}
+
+/* Currency row in pricing */
+.admin-pricing-currency-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.admin-pricing-currency-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #555;
+}
+
+.admin-currency-toggle.small {
+  padding: 0.15rem;
+  border-radius: 0.4rem;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255,255,255,0.06);
+  display: inline-flex;
+  gap: 0.15rem;
+}
+
+.admin-currency-toggle.small .admin-currency-btn {
+  padding: 0.2rem 0.55rem;
+  font-size: 0.65rem;
+  border-radius: 0.3rem;
+}
+
+/* Options Map — price per option list */
+.admin-pricing-options-map {
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-pricing-options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.admin-pricing-option-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.6rem;
+  border-radius: 0.5rem;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  transition: all 0.2s ease;
+}
+
+.admin-pricing-option-row:hover {
+  background: rgba(0, 0, 0, 0.35);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.admin-pricing-option-name {
+  flex: 1;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #ccc;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-pricing-option-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  flex-shrink: 0;
+}
+
+.admin-pricing-option-input {
+  width: 80px;
+  padding: 0.3rem 0.5rem;
+  border-radius: 0.4rem;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #4ade80;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-align: center;
+  outline: none;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.admin-pricing-option-input:focus {
+  border-color: rgba(34, 197, 94, 0.4);
+  box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.1);
+}
+
+.admin-pricing-option-input::placeholder {
+  color: #333;
+}
+
+.admin-pricing-option-currency {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #555;
+  min-width: 1.5rem;
+}
+
+/* Per unit pricing */
+.admin-pricing-per-unit,
+.admin-pricing-fixed {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.admin-pricing-unit-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.admin-pricing-unit-input {
+  flex: 1;
+  padding: 0.45rem 0.65rem;
+  border-radius: 0.5rem;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #4ade80;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-align: center;
+  outline: none;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.admin-pricing-unit-input:focus {
+  border-color: rgba(34, 197, 94, 0.4);
+  box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.1);
+}
+
+.admin-pricing-unit-input::placeholder {
+  color: #333;
+}
+
+.admin-pricing-unit-currency {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #666;
+  white-space: nowrap;
+}
+
+.admin-pricing-unit-example {
+  font-size: 0.68rem;
+  color: #555;
+  font-weight: 600;
+  padding: 0.35rem 0.5rem;
+  border-radius: 0.35rem;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.admin-pricing-empty {
+  font-size: 0.75rem;
+  color: #555;
+  font-weight: 600;
+  text-align: center;
+  padding: 0.75rem;
+  border: 1px dashed rgba(255, 255, 255, 0.08);
+  border-radius: 0.5rem;
+}
+
+/* ============================================================
+   Order Pricing Card (Detail Modal)
+   ============================================================ */
+
+.admin-order-pricing-card {
+  background: rgba(34, 197, 94, 0.04);
+  border: 1px solid rgba(34, 197, 94, 0.12);
+  border-radius: 1rem;
+  padding: 1rem 1.15rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.admin-order-pricing-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.admin-order-pricing-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #aaa;
+}
+
+.admin-order-pricing-value {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #4ade80;
+  white-space: nowrap;
+  direction: ltr;
+}
+
+.admin-order-pricing-divider {
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(34, 197, 94, 0.2), transparent);
+  margin: 0.15rem 0;
+}
+
+.admin-order-pricing-total .admin-order-pricing-label {
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+.admin-order-pricing-total .admin-order-pricing-value {
+  font-size: 1rem;
+  font-weight: 900;
+  color: #4ade80;
+  text-shadow: 0 0 12px rgba(74, 222, 128, 0.3);
+}
+
+/* Order Price Badge (on card in list) */
+.admin-order-price-badge {
+  margin-right: auto;
+  margin-left: 0;
+  font-size: 0.78rem;
+  font-weight: 800;
+  padding: 0.2rem 0.65rem;
+  border-radius: 0.5rem;
+  background: rgba(34, 197, 94, 0.1);
+  color: #4ade80;
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  white-space: nowrap;
+  direction: ltr;
+}
+
+/* Custom Fields Improved Grid */
+.admin-order-custom-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+.admin-order-custom-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.6rem 0.85rem;
+  border-radius: 0.65rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.admin-order-custom-key {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #666;
+}
+
+.admin-order-custom-val {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #ddd;
+  word-break: break-word;
+}
+
+@media (max-width: 480px) {
+  .admin-order-custom-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ============================================================
+   Comprehensive Mobile Responsive — Admin Panel
+   ============================================================ */
+
+@media (max-width: 768px) {
+  /* ---- Header ---- */
+  .admin-header {
+    padding: 0.6rem 0.85rem;
+    gap: 0.5rem;
+  }
+  
+  .admin-header-title h1 {
+    font-size: 1rem;
+  }
+  
+  .admin-header-logo {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 0.5rem;
+    font-size: 0.7rem;
+  }
+  
+  .admin-header-title {
+    gap: 0.5rem;
+  }
+  
+  /* Hide email on mobile */
+  .admin-header span[style*="fontSize"] {
+    display: none !important;
+  }
+  
+  .admin-back-btn {
+    padding: 0.4rem 0.75rem;
+    font-size: 0.75rem;
+    gap: 0.35rem;
+    border-radius: 0.6rem;
+  }
+  
+  .admin-back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  /* ---- Sub-page Header ---- */
+  .admin-subpage-back {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 0.55rem;
+  }
+  
+  .admin-subpage-icon {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 0.55rem;
+  }
+  
+  .admin-subpage-icon svg {
+    width: 16px;
+    height: 16px;
+  }
+  
+  /* ---- Stats Bar ---- */
+  .admin-stats-bar {
+    padding: 0.75rem;
+    gap: 0.5rem;
+    flex-wrap: nowrap;
+  }
+  
+  .admin-stat-card {
+    padding: 0.5rem 0.65rem;
+    border-radius: 0.75rem;
+    gap: 0.5rem;
+    min-width: 0;
+    flex-shrink: 0;
+  }
+  
+  .admin-stat-icon {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 0.5rem;
+  }
+  
+  .admin-stat-icon svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .admin-stat-value {
+    font-size: 1rem;
+  }
+  
+  .admin-stat-label {
+    font-size: 0.6rem;
+  }
+  
+  /* ---- Dashboard Grid ---- */
+  .admin-dashboard-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+    max-width: 100%;
+  }
+  
+  .admin-dashboard-btn {
+    padding: 1rem;
+    border-radius: 1.15rem;
+  }
+  
+  .admin-dashboard-btn-header {
+    margin-bottom: 0.75rem;
+  }
+  
+  .admin-dashboard-btn-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 0.75rem;
+  }
+  
+  .admin-dashboard-btn-icon svg {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .admin-dashboard-btn-count {
+    font-size: 1rem;
+    padding: 0.25rem 0.6rem;
+    border-radius: 0.55rem;
+    min-width: 2rem;
+  }
+  
+  .admin-dashboard-btn-label {
+    font-size: 0.95rem;
+    margin-bottom: 0.15rem;
+  }
+  
+  .admin-dashboard-btn-desc {
+    font-size: 0.7rem;
+    margin-bottom: 0.65rem;
+    line-height: 1.4;
+  }
+  
+  .admin-dashboard-btn-arrow svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  /* ---- Content Area ---- */
+  .admin-content {
+    padding: 0.85rem;
+  }
+  
+  /* ---- Order Cards ---- */
+  .admin-order-card {
+    padding: 1rem 1.15rem;
+    border-radius: 1rem;
+  }
+  
+  .admin-order-title {
+    font-size: 0.9rem;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+  }
+  
+  .admin-order-price-badge {
+    font-size: 0.7rem;
+    padding: 0.15rem 0.5rem;
+  }
+  
+  .admin-order-header {
+    margin-bottom: 0.6rem;
+  }
+  
+  .admin-order-date {
+    font-size: 0.65rem;
+  }
+  
+  .admin-order-customer-item {
+    font-size: 0.78rem;
+  }
+  
+  /* ---- Detail Modal ---- */
+  .admin-detail-modal {
+    width: 96%;
+    max-height: 92vh;
+    border-radius: 1.25rem;
+    max-width: 100%;
+  }
+  
+  .admin-detail-modal-header {
+    padding: 1rem 1.15rem;
+  }
+  
+  .admin-detail-modal-title {
+    padding: 1rem 1.15rem;
+    font-size: 1rem;
+  }
+  
+  .admin-detail-modal-grid {
+    padding: 0.85rem 1.15rem;
+    gap: 0.5rem;
+  }
+  
+  .admin-detail-modal-section {
+    padding: 0 1.15rem;
+  }
+  
+  .admin-detail-modal-actions {
+    padding: 1rem 1.15rem;
+    flex-wrap: wrap;
+  }
+  
+  .admin-detail-modal-info {
+    padding: 0.65rem 0.85rem;
+  }
+  
+  .admin-detail-modal-info-value {
+    font-size: 0.8rem;
+  }
+  
+  /* ---- Order Pricing Card (mobile) ---- */
+  .admin-order-pricing-card {
+    padding: 0.85rem 1rem;
+  }
+  
+  .admin-order-pricing-label {
+    font-size: 0.75rem;
+  }
+  
+  .admin-order-pricing-value {
+    font-size: 0.78rem;
+  }
+  
+  .admin-order-pricing-total .admin-order-pricing-label {
+    font-size: 0.82rem;
+  }
+  
+  .admin-order-pricing-total .admin-order-pricing-value {
+    font-size: 0.9rem;
+  }
+  
+  /* ---- Admin Editor (service/package/offer) ---- */
+  .admin-editor {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    min-height: auto;
+  }
+  
+  .admin-editor-form {
+    border-radius: 1rem;
+  }
+  
+  .admin-editor-preview {
+    position: relative;
+    top: 0;
+  }
+  
+  .admin-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .admin-card {
+    padding: 1.15rem;
+    border-radius: 1rem;
+  }
+  
+  .admin-card-image {
+    height: 140px;
+    border-radius: 0.6rem;
+  }
+  
+  /* ---- Admin Modals ---- */
+  .admin-modal-overlay {
+    padding: 0.75rem;
+  }
+  
+  .admin-modal {
+    padding: 1.5rem;
+    border-radius: 1.25rem;
+  }
+  
+  /* ---- Form fields ---- */
+  .admin-field-row {
+    grid-template-columns: 1fr;
+  }
+  
+  .admin-field-row-3 {
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  /* ---- Order Filters ---- */
+  .admin-order-filters {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+    gap: 0.35rem;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  
+  .admin-order-filters::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .admin-order-filter {
+    flex-shrink: 0;
+    padding: 0.45rem 0.85rem;
+    font-size: 0.72rem;
+  }
+  
+  /* ---- Charts ---- */
+  .admin-chart-section {
+    padding: 0 0.85rem;
+  }
 }

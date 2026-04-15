@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { createPortal } from "react-dom";
 import { X, ShoppingCart, Heart } from "lucide-react";
 import { ServiceData, formatDisplayPrice } from "../lib/firebase";
 import { useDevicePerformance } from "../lib/useDevicePerformance";
+import { useBodyLock } from "../lib/useBodyLock";
 
 interface ServiceDetailsModalProps {
   isOpen: boolean;
@@ -29,11 +30,7 @@ export function ServiceDetailsModal({
     setMounted(true);
   }, []);
 
-  useEffect(() => {
-    if (isOpen) document.body.style.overflow = "hidden";
-    else document.body.style.overflow = "unset";
-    return () => { document.body.style.overflow = "unset"; };
-  }, [isOpen]);
+  useBodyLock(isOpen);
 
   if (!mounted || !service) return null;
 
@@ -115,7 +112,7 @@ export function ServiceDetailsModal({
             {/* Footer Action */}
             <div className="p-5 border-t border-white/10 bg-[#0d0d0d] shrink-0">
               <button
-                onClick={() => { onClose(); onOrder(); }}
+                onClick={onOrder}
                 className="w-full flex items-center justify-center gap-2 py-4 rounded-xl bg-white text-black hover:bg-gray-200 transition-all font-bold text-base md:text-lg font-arabic shadow-xl hover:scale-[1.02] active:scale-[0.98]"
               >
                 <ShoppingCart size={20} />

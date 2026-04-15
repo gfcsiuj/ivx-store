@@ -23,6 +23,7 @@ import { AdminUsers } from "./components/admin/AdminUsers";
 import { LoadingScreen } from "./components/LoadingScreen";
 import { CustomCursor } from "./components/CustomCursor";
 import { ScrollToTop } from "./components/ScrollToTop";
+import { SeoHead } from "./components/SeoHead";
 import { LayoutGrid, Package, Flame, ClipboardList, MessageCircle, Settings, Users, AlertCircle } from "lucide-react";
 import { NotFoundPage } from "./pages/NotFoundPage";
 import { onAuthChange, updateUserPresence, updateGuestPresence, checkUserBanned, logoutAdmin, type User } from "./lib/firebase";
@@ -218,6 +219,7 @@ function AppContent() {
 export default function App() {
   return (
     <Router>
+      <SeoHead />
       <AppContent />
     </Router>
   );

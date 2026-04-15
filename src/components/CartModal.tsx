@@ -1,23 +1,14 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { createPortal } from "react-dom";
 import { X, ShoppingBag, Clock, CheckCircle2, XCircle, RefreshCw, Package, Loader2, User } from "lucide-react";
 import { useAuth } from "../lib/AuthContext";
-import { getUserOrders, OrderData } from "../lib/firebase";
+import { getUserOrders, OrderData, formatTimestamp } from "../lib/firebase";
 import { useDevicePerformance } from "../lib/useDevicePerformance";
+import { useBodyLock } from "../lib/useBodyLock";
+import { STATUS_CONFIG, ITEM_TYPE_LABELS } from "../lib/constants";
 
-const STATUS_CONFIG: Record<OrderData["status"], { label: string; color: string; bg: string; icon: React.ReactNode }> = {
-  pending: { label: "قيد الانتظار", color: "#f59e0b", bg: "rgba(245,158,11,0.1)", icon: <Clock size={14} /> },
-  processing: { label: "قيد المعالجة", color: "#3b82f6", bg: "rgba(59,130,246,0.1)", icon: <RefreshCw size={14} /> },
-  completed: { label: "مكتمل", color: "#22c55e", bg: "rgba(34,197,94,0.1)", icon: <CheckCircle2 size={14} /> },
-  cancelled: { label: "ملغي", color: "#ef4444", bg: "rgba(239,68,68,0.1)", icon: <XCircle size={14} /> },
-};
 
-const ITEM_TYPE_LABELS: Record<string, string> = {
-  service: "خدمة",
-  package: "باقة",
-  offer: "عرض",
-};
 
 interface CartModalProps {
   isOpen: boolean;
@@ -50,26 +41,9 @@ export function CartModal({ isOpen, onClose }: CartModalProps) {
     }
   }, [isOpen, user]);
 
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-    return () => { document.body.style.overflow = 'unset'; };
-  }, [isOpen]);
+  useBodyLock(isOpen);
 
-  const formatDate = (timestamp: any) => {
-    if (!timestamp) return "—";
-    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
-    return new Intl.DateTimeFormat("ar-IQ", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    }).format(date);
-  };
+  const formatDate = formatTimestamp;
 
   const filteredOrders = filter === "all" ? orders : orders.filter(o => o.status === filter);
 

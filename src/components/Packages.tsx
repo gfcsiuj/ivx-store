@@ -266,6 +266,8 @@ export function Packages() {
         selectedItem={selectedPackage?.title || ""}
         formFields={selectedPackage?.orderFormFields}
         itemType="package"
+        basePrice={selectedPackage?.price ? parseFloat(selectedPackage.price) : undefined}
+        baseCurrency={selectedPackage?.currency}
       />
     </section>
   );

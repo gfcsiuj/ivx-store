@@ -1,12 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowRight, Loader2, Zap, ExternalLink, LogOut } from "lucide-react";
-import { onAuthChange, logoutAdmin, type User } from "../lib/firebase";
+import { onAuthChange, logoutAdmin, ADMIN_UID, type User } from "../lib/firebase";
 import { AdminLogin } from "../components/admin/AdminLogin";
 import "../admin.css";
-
-// ADMIN UID — only this user can access admin sub-pages
-const ADMIN_UID = "1kxnlTP7AlZvFwc82E546aNFX8j2";
 
 interface AdminSubPageProps {
   title: string;
@@ -110,13 +107,13 @@ export function AdminSubPage({ title, icon, iconColor, children }: AdminSubPageP
           </div>
           <h1>{title}</h1>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+        <div className="admin-header-actions">
           {user?.email && (
-            <span style={{ fontSize: "0.8rem", color: "#666", fontWeight: 600 }}>{user.email}</span>
+            <span className="admin-header-email">{user.email}</span>
           )}
           <Link to="/" className="admin-back-btn">
             <ExternalLink size={16} />
-            عرض الموقع
+            <span className="admin-back-btn-text">عرض الموقع</span>
           </Link>
           <button
             className="admin-back-btn"
@@ -125,7 +122,7 @@ export function AdminSubPage({ title, icon, iconColor, children }: AdminSubPageP
             style={{ color: "#ef4444", borderColor: "rgba(239,68,68,0.2)" }}
           >
             {loggingOut ? <Loader2 size={16} style={{ animation: "spin 1s linear infinite" }} /> : <LogOut size={16} />}
-            خروج
+            <span className="admin-back-btn-text">خروج</span>
           </button>
         </div>
       </header>

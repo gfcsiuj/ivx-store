@@ -2,9 +2,10 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { createPortal } from "react-dom";
 import { X, Heart, Package, LayoutGrid, ArrowLeft } from "lucide-react";
-import { getServices, getPackages, ServiceData, PackageData, formatDisplayPrice } from "../lib/firebase";
+import { getServices, getPackages, ServiceData, PackageData, formatDisplayPrice, type Currency } from "../lib/firebase";
 import { useNavigate } from "react-router-dom";
 import { useDevicePerformance } from "../lib/useDevicePerformance";
+import { useBodyLock } from "../lib/useBodyLock";
 
 interface FavoritesModalProps {
   isOpen: boolean;
@@ -16,8 +17,8 @@ type FavItem = {
   title: string;
   type: string;
   imageUrl?: string;
-  price?: number;
-  currency?: string;
+  price?: string;
+  currency?: Currency;
   isPackage: boolean;
 };
 
@@ -80,14 +81,7 @@ export function FavoritesModal({ isOpen, onClose }: FavoritesModalProps) {
     }
   }, [isOpen]);
 
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-    return () => { document.body.style.overflow = 'unset'; };
-  }, [isOpen]);
+  useBodyLock(isOpen);
 
   const handleNavigateToItem = (isPackage: boolean) => {
     onClose();

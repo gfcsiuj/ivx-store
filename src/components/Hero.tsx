@@ -4,12 +4,18 @@ import { useNavigate } from "react-router-dom";
 import { ArrowLeft, MessageCircle, Sparkles, Gamepad2 } from "lucide-react";
 import { AnimatedIvxLogo } from "./AnimatedIvxLogo";
 import { useDevicePerformance } from "../lib/useDevicePerformance";
+import { getSettings, SiteSettings } from "../lib/firebase";
 
 export function Hero() {
   const words = ["اشتراكات", "ألعاب", "حسابات", "خدمات", "عروض"];
   const [index, setIndex] = useState(0);
   const { isLowEnd } = useDevicePerformance();
   const navigate = useNavigate();
+  const [settings, setSettings] = useState<SiteSettings | null>(null);
+
+  useEffect(() => {
+    getSettings().then(setSettings);
+  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
