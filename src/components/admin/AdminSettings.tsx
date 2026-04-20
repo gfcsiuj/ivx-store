@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { Save, Loader2, Globe, MessageCircle, Phone } from "lucide-react";
+import { Save, Loader2, Globe, MessageCircle, Phone, Settings, CheckCircle2, MapPin, Mail } from "lucide-react";
+import { SocialIcons } from "../SocialIcons";
 import { SiteSettings, getSettings, saveSettings, getServiceTypes, saveServiceTypes } from "../../lib/firebase";
 
 interface AdminSettingsProps {
@@ -65,16 +66,25 @@ export function AdminSettings({ onCountChange }: AdminSettingsProps) {
   }
 
   return (
-    <div>
-      {/* Save button */}
-      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "1.5rem" }}>
-        <button className="admin-btn admin-btn-primary" onClick={handleSave} disabled={saving}>
-          {saving ? <Loader2 size={18} style={{ animation: "spin 1s linear infinite" }} /> : <Save size={18} />}
-          {saving ? "جاري الحفظ..." : "حفظ الإعدادات"}
+    <div className="pb-24 max-w-6xl mx-auto">
+      {/* Header & Actions */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+        <div>
+          <h2 className="text-2xl font-black text-white flex items-center gap-3 font-arabic">
+            <Settings className="text-indigo-400" size={28} />
+            إعدادات النظام الشاملة
+          </h2>
+          <p className="text-gray-400 text-sm mt-1 font-arabic">التحكم بكافة الروابط ومعلومات التواصل الخاصة بالموقع.</p>
+        </div>
+        <button className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl transition-all shadow-[0_0_20px_rgba(79,70,229,0.3)] hover:shadow-[0_0_30px_rgba(79,70,229,0.5)] flex items-center gap-2" onClick={handleSave} disabled={saving}>
+          {saving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
+          {saving ? "جاري الحفظ..." : "حفظ التغييرات"}
         </button>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "1.5rem" }}>
+
+
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
         {/* Contact Info */}
         <div className="admin-editor-form" style={{ borderRadius: "1.5rem", overflow: "hidden" }}>
           <div style={{ padding: "1rem 1.5rem", borderBottom: "1px solid rgba(255,255,255,0.06)", display: "flex", alignItems: "center", gap: "0.5rem" }}>
@@ -99,6 +109,26 @@ export function AdminSettings({ onCountChange }: AdminSettingsProps) {
                 value={settings.email}
                 onChange={(e) => handleChange("email", e.target.value)}
                 placeholder="support@example.com"
+                dir="ltr"
+              />
+            </div>
+            <div className="admin-form-group">
+              <label className="admin-form-label">رقم الهاتف (في بطاقة اتصل بنا)</label>
+              <input
+                className="admin-form-input"
+                value={settings.contactPhoneNumber || ""}
+                onChange={(e) => handleChange("contactPhoneNumber", e.target.value)}
+                placeholder="+964 783 079 6658"
+                dir="ltr"
+              />
+            </div>
+            <div className="admin-form-group">
+              <label className="admin-form-label">الإيميل (في بطاقة الإيميل)</label>
+              <input
+                className="admin-form-input"
+                value={settings.contactEmail || ""}
+                onChange={(e) => handleChange("contactEmail", e.target.value)}
+                placeholder="support@ivx.com"
                 dir="ltr"
               />
             </div>
@@ -232,13 +262,54 @@ export function AdminSettings({ onCountChange }: AdminSettingsProps) {
                   placeholder="متجرك الأول للألعاب"
                 />
               </div>
+              <div className="admin-form-group">
+                <label className="admin-form-label">نص أوقات العمل (في صفحة تواصل)</label>
+                <input
+                  className="admin-form-input"
+                  value={settings.workingHoursText || ""}
+                  onChange={(e) => handleChange("workingHoursText", e.target.value)}
+                  placeholder="نحن متاحون للرد على مكالماتك خلال أوقات العمل."
+                />
+              </div>
+              <div className="admin-form-group">
+                <label className="admin-form-label">نص الإيميل (في صفحة تواصل)</label>
+                <input
+                  className="admin-form-input"
+                  value={settings.emailContactText || ""}
+                  onChange={(e) => handleChange("emailContactText", e.target.value)}
+                  placeholder="أرسل لنا استفسارك وسنرد عليك بأقرب وقت."
+                />
+              </div>
+              <div className="admin-form-group">
+                <label className="admin-form-label">عنوان الموقع (في صفحة تواصل)</label>
+                <input
+                  className="admin-form-input"
+                  value={settings.locationTitle || ""}
+                  onChange={(e) => handleChange("locationTitle", e.target.value)}
+                  placeholder="متجر إلكتروني يخدم جميع أنحاء العالم."
+                />
+              </div>
+              <div className="admin-form-group">
+                <label className="admin-form-label">تفاصيل الموقع (في صفحة تواصل)</label>
+                <input
+                  className="admin-form-input"
+                  value={settings.locationSubtitle || ""}
+                  onChange={(e) => handleChange("locationSubtitle", e.target.value)}
+                  placeholder="العراق IQ"
+                />
+              </div>
             </div>
           </div>
         </div>
       </div>
 
       {/* Toast */}
-      {toast && <div className="admin-toast">{toast}</div>}
+      {toast && (
+        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 px-6 py-3 bg-green-500 text-white font-bold rounded-full shadow-[0_10px_40px_rgba(34,197,94,0.4)] flex items-center gap-2 animate-bounce z-50">
+          <CheckCircle2 size={20} />
+          {toast}
+        </div>
+      )}
     </div>
   );
 }

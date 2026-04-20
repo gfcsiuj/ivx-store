@@ -4,8 +4,11 @@ import { PageHero } from "../components/PageHero";
 import { PageLayout } from "../components/PageLayout";
 import { MapPin, Phone, Mail, Instagram, ArrowLeft, MessageCircle, Loader2, CheckCircle2, Terminal, Send, Code, Monitor, Cpu, Zap } from "lucide-react";
 import { addMessage } from "../lib/firebase";
+import { useSettings } from "../lib/SettingsContext";
+import { SocialIcons } from "../components/SocialIcons";
 
 export function ContactPage() {
+  const { settings } = useSettings();
   const [form, setForm] = useState({ name: "", phone: "", email: "", message: "" });
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
@@ -63,8 +66,8 @@ export function ContactPage() {
                 </div>
                 <div>
                   <h3 className="text-lg md:text-xl font-bold text-white mb-1 md:mb-2 font-arabic">اتصل بنا</h3>
-                  <p className="text-sm md:text-base text-gray-400 mb-1 md:mb-2 font-arabic">نحن متاحون للرد على مكالماتك خلال أوقات العمل.</p>
-                  <a href="tel:+9647830796658" className="text-base md:text-lg font-bold text-white font-arabic block" dir="ltr">+964 783 079 6658</a>
+                  <p className="text-sm md:text-base text-gray-400 mb-1 md:mb-2 font-arabic">{settings.workingHoursText || "نحن متاحون للرد على مكالماتك خلال أوقات العمل."}</p>
+                  <a href={settings.contactPhoneNumber ? `tel:${settings.contactPhoneNumber.replace(/[^0-9+]/g, '')}` : "tel:+9647830796658"} className="text-base md:text-lg font-bold text-white font-arabic block" dir="ltr">{settings.contactPhoneNumber || "+964 783 079 6658"}</a>
                 </div>
               </motion.div>
 
@@ -80,8 +83,8 @@ export function ContactPage() {
                 </div>
                 <div>
                   <h3 className="text-lg md:text-xl font-bold text-white mb-1 md:mb-2 font-arabic">البريد الإلكتروني</h3>
-                  <p className="text-sm md:text-base text-gray-400 mb-1 md:mb-2 font-arabic">أرسل لنا استفسارك وسنرد عليك بأقرب وقت.</p>
-                  <a href="mailto:support@ivx.com" className="text-base md:text-lg font-bold text-white font-arabic block" dir="ltr">support@ivx.com</a>
+                  <p className="text-sm md:text-base text-gray-400 mb-1 md:mb-2 font-arabic">{settings.emailContactText || "أرسل لنا استفسارك وسنرد عليك بأقرب وقت."}</p>
+                  <a href={`mailto:${settings.contactEmail || "support@ivx.com"}`} className="text-base md:text-lg font-bold text-white font-arabic block" dir="ltr">{settings.contactEmail || "support@ivx.com"}</a>
                 </div>
               </motion.div>
 
@@ -97,8 +100,8 @@ export function ContactPage() {
                 </div>
                 <div>
                   <h3 className="text-lg md:text-xl font-bold text-white mb-1 md:mb-2 font-arabic">موقعنا</h3>
-                  <p className="text-sm md:text-base text-gray-400 mb-1 md:mb-2 font-arabic">متجر إلكتروني يخدم جميع أنحاء العالم.</p>
-                  <p className="text-base md:text-lg font-bold text-white font-arabic">العراق 🇮🇶</p>
+                  <p className="text-sm md:text-base text-gray-400 mb-1 md:mb-2 font-arabic">{settings.locationTitle || "متجر إلكتروني يخدم جميع أنحاء العالم."}</p>
+                  <p className="text-base md:text-lg font-bold text-white font-arabic">{settings.locationSubtitle || "العراق 🇮🇶"}</p>
                 </div>
               </motion.div>
 
@@ -108,14 +111,9 @@ export function ContactPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: 0.3 }}
-                className="flex items-center gap-4 pt-4"
+                className="flex items-center justify-end w-full pt-4"
               >
-                <a href="https://wa.me/9647830796658" target="_blank" rel="noopener noreferrer" className="w-12 h-12 rounded-full bg-gray-900/60 border border-white/10 flex items-center justify-center text-gray-400 hover:text-white hover:bg-white hover:text-black hover:scale-110 transition-all">
-                  <MessageCircle className="w-5 h-5" />
-                </a>
-                <a href="https://www.instagram.com/ivx_iraq" target="_blank" rel="noopener noreferrer" className="w-12 h-12 rounded-full bg-gray-900/60 border border-white/10 flex items-center justify-center text-gray-400 hover:text-white hover:bg-white hover:text-black hover:scale-110 transition-all">
-                  <Instagram className="w-5 h-5" />
-                </a>
+                <SocialIcons settings={settings} />
               </motion.div>
             </div>
 

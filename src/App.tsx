@@ -31,6 +31,7 @@ import { CategoryServicesPage } from "./pages/CategoryServicesPage";
 import { onAuthChange, updateUserPresence, updateGuestPresence, checkUserBanned, logoutAdmin, type User } from "./lib/firebase";
 import { CurrencyProvider } from "./lib/CurrencyContext";
 import { useEffect } from "react";
+import { SettingsProvider } from "./lib/SettingsContext";
 
 function AnimatedRoutes() {
   const location = useLocation();
@@ -203,33 +204,37 @@ function AppContent() {
   }
 
   return (
-    <CurrencyProvider>
-      <PresenceTracker />
-      <CustomCursor />
-      <ScrollToTop />
-      <AnimatePresence mode="wait">
-        {isLoading ? (
-          <LoadingScreen key="loading" onComplete={() => setIsLoading(false)} />
-        ) : (
-          <motion.div
-            key="main-app"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, ease: "easeOut" }}
-          >
-            <AnimatedRoutes />
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </CurrencyProvider>
+    <>
+      <CurrencyProvider>
+        <PresenceTracker />
+        <CustomCursor />
+        <ScrollToTop />
+        <AnimatePresence mode="wait">
+          {isLoading ? (
+            <LoadingScreen key="loading" onComplete={() => setIsLoading(false)} />
+          ) : (
+            <motion.div
+              key="main-app"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5, ease: "easeOut" }}
+            >
+              <AnimatedRoutes />
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </CurrencyProvider>
+    </>
   );
 }
 
 export default function App() {
   return (
     <Router>
-      <SeoHead />
-      <AppContent />
+      <SettingsProvider>
+        <SeoHead />
+        <AppContent />
+      </SettingsProvider>
     </Router>
   );
 }

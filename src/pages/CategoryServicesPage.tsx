@@ -140,11 +140,11 @@ export function CategoryServicesPage() {
 
           {/* Loading State */}
           {loading ? (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6">
               {[1, 2, 3, 4, 5, 6].map((i) => (
                 <div key={i} className="bg-gray-900/40 border border-white/10 rounded-2xl md:rounded-3xl overflow-hidden animate-pulse">
-                  <div className="h-32 md:h-48 bg-gray-800/50" />
-                  <div className="p-4 md:p-6 space-y-3">
+                  <div className="h-28 md:h-48 bg-gray-800/50" />
+                  <div className="p-3 md:p-6 space-y-2 md:space-y-3">
                     <div className="h-4 bg-gray-800/50 rounded w-3/4" />
                     <div className="h-3 bg-gray-800/30 rounded w-full" />
                     <div className="h-3 bg-gray-800/30 rounded w-1/2" />
@@ -157,7 +157,7 @@ export function CategoryServicesPage() {
           ) : (
             <>
               {/* Services Grid */}
-              <motion.div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+              <motion.div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6">
                 <AnimatePresence mode="sync">
                   {searchedServices.map((service) => (
                     <motion.div
@@ -170,8 +170,8 @@ export function CategoryServicesPage() {
                       className="bg-gray-900/40 border border-white/10 rounded-2xl md:rounded-3xl overflow-hidden hover:border-white/30 transition-all duration-500 group flex flex-col cursor-pointer"
                     >
                       {/* Image */}
-                      <div className="h-32 md:h-48 overflow-hidden relative">
-                        <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors duration-500 z-10" />
+                      <div className="relative overflow-hidden md:h-48 bg-gradient-to-br from-gray-900/80 via-[#0d0d0d] to-black">
+                        <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-500 z-10" />
                         {service.type && (
                           <div className="absolute top-2 right-2 md:top-3 md:right-3 z-20">
                             <span className="bg-black/70 backdrop-blur-sm text-white text-[9px] md:text-xs font-bold px-2 py-1 md:px-3 md:py-1 rounded-full border border-white/10">
@@ -190,7 +190,7 @@ export function CategoryServicesPage() {
                           <img
                             src={service.imageUrl}
                             alt={service.title}
-                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                            className="w-full h-auto md:h-full md:w-full object-scale-down md:object-cover transition-transform duration-700 group-hover:scale-105 md:group-hover:scale-110 max-h-[180px] md:max-h-none"
                             referrerPolicy="no-referrer"
                             loading="lazy"
                             decoding="async"
@@ -203,11 +203,11 @@ export function CategoryServicesPage() {
                       </div>
 
                       {/* Content */}
-                      <div className="p-4 md:p-6 flex flex-col flex-grow">
-                        <h3 className="text-sm md:text-lg font-arabic font-bold text-white mb-1.5 md:mb-2 group-hover:text-gray-200 transition-colors line-clamp-2">
+                      <div className="p-3 md:p-6 flex flex-col flex-grow">
+                        <h3 className="text-[13px] md:text-lg font-arabic font-bold text-white mb-1 md:mb-2 group-hover:text-gray-200 transition-colors line-clamp-2 leading-snug">
                           {service.title}
                         </h3>
-                        <p className="text-gray-400 font-arabic text-[10px] md:text-sm leading-relaxed mb-3 md:mb-5 flex-grow line-clamp-2 md:line-clamp-3">
+                        <p className="text-gray-400 font-arabic text-[10px] md:text-sm leading-relaxed mb-2 md:mb-5 flex-grow line-clamp-3">
                           {service.description}
                         </p>
 
@@ -232,10 +232,10 @@ export function CategoryServicesPage() {
                             onClick={(e) => handleAddToCart(service, e)}
                             disabled={cartLoading === service.id}
                             className={`w-10 md:w-12 py-2 md:py-3 rounded-lg md:rounded-xl flex items-center justify-center transition-all duration-300 ${addedToCart === service.id
-                                ? "bg-emerald-500/20 border border-emerald-500/30 text-emerald-400"
-                                : cartLoading === service.id
-                                  ? "bg-white/5 border border-white/10 text-gray-500"
-                                  : "bg-white/5 border border-white/10 text-white hover:bg-white/10 hover:border-white/20"
+                              ? "bg-emerald-500/20 border border-emerald-500/30 text-emerald-400"
+                              : cartLoading === service.id
+                                ? "bg-white/5 border border-white/10 text-gray-500"
+                                : "bg-white/5 border border-white/10 text-white hover:bg-white/10 hover:border-white/20"
                               }`}
                             title="أضف للسلة"
                           >
@@ -256,20 +256,20 @@ export function CategoryServicesPage() {
 
               {/* Empty State */}
               {searchedServices.length === 0 && (
-                <motion.div 
+                <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   className="flex flex-col items-center justify-center py-24 text-center space-y-6"
                 >
                   <motion.div
-                    animate={{ 
+                    animate={{
                       y: [0, -15, 0],
                       scale: [1, 1.05, 1]
                     }}
-                    transition={{ 
-                      duration: 3, 
-                      repeat: Infinity, 
-                      ease: "easeInOut" 
+                    transition={{
+                      duration: 3,
+                      repeat: Infinity,
+                      ease: "easeInOut"
                     }}
                     className="relative"
                   >

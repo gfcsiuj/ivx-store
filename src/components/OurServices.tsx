@@ -81,11 +81,11 @@ export function OurServices() {
         </div>
 
         {loading ? (
-          <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8" dir="rtl">
+          <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-8" dir="rtl">
             {[1, 2, 3, 4].map((i) => (
               <div key={i} className="bg-gray-900/40 border border-white/10 rounded-2xl md:rounded-3xl overflow-hidden animate-pulse">
-                <div className="h-32 md:h-56 bg-gray-800/50" />
-                <div className="p-4 md:p-8 space-y-3">
+                <div className="h-28 md:h-56 bg-gray-800/50" />
+                <div className="p-3 md:p-8 space-y-2 md:space-y-3">
                   <div className="h-5 bg-gray-800/50 rounded w-3/4" />
                   <div className="h-3 bg-gray-800/30 rounded w-full" />
                   <div className="h-3 bg-gray-800/30 rounded w-1/2" />
@@ -95,7 +95,7 @@ export function OurServices() {
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8" dir="rtl">
+          <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-8" dir="rtl">
             {services.map((service, idx) => (
               <motion.div
                 key={service.id}
@@ -106,8 +106,8 @@ export function OurServices() {
                 onClick={() => handleDetails(service)}
                 className="bg-gray-900/40 border border-white/10 rounded-2xl md:rounded-3xl overflow-hidden hover:border-white/30 transition-all duration-500 group flex flex-col cursor-pointer"
               >
-                <div className="h-32 md:h-56 overflow-hidden relative">
-                  <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors duration-500 z-10" />
+                <div className="relative overflow-hidden md:h-56 bg-gradient-to-br from-gray-900/80 via-[#0d0d0d] to-black">
+                  <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-500 z-10" />
                   {service.type && (
                     <div className="absolute top-2 right-2 md:top-3 md:right-3 z-20">
                       <span className="bg-black/70 backdrop-blur-sm text-white text-[9px] md:text-xs font-bold px-2 py-1 md:px-3 md:py-1 rounded-full border border-white/10">
@@ -126,7 +126,7 @@ export function OurServices() {
                     <img
                       src={service.imageUrl}
                       alt={service.title}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                      className="w-full h-auto md:h-full md:w-full object-scale-down md:object-cover transition-transform duration-700 group-hover:scale-105 md:group-hover:scale-110 max-h-[180px] md:max-h-none"
                       referrerPolicy="no-referrer"
                       loading="lazy"
                       decoding="async"
@@ -137,11 +137,11 @@ export function OurServices() {
                     </div>
                   )}
                 </div>
-                <div className="p-4 md:p-8 flex flex-col flex-grow">
-                  <h3 className="text-sm md:text-2xl font-arabic font-bold text-white mb-2 md:mb-3 group-hover:text-gray-200 transition-colors line-clamp-2">
+                <div className="p-3 md:p-8 flex flex-col flex-grow">
+                  <h3 className="text-[13px] md:text-2xl font-arabic font-bold text-white mb-1 md:mb-3 group-hover:text-gray-200 transition-colors line-clamp-2 leading-snug">
                     {service.title}
                   </h3>
-                  <p className="text-gray-400 font-arabic text-xs md:text-sm leading-relaxed mb-4 md:mb-8 flex-grow line-clamp-3">
+                  <p className="text-gray-400 font-arabic text-[10px] md:text-sm leading-relaxed mb-2 md:mb-8 flex-grow line-clamp-3">
                     {service.description}
                   </p>
                   {service.price && (

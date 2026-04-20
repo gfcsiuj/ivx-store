@@ -249,6 +249,12 @@ export interface SiteSettings {
   heroTitle: string;
   heroSubtitle: string;
   aboutText: string;
+  workingHoursText?: string;
+  emailContactText?: string;
+  locationTitle?: string;
+  locationSubtitle?: string;
+  contactPhoneNumber?: string;
+  contactEmail?: string;
 }
 
 export interface OrderData {

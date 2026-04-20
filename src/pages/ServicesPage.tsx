@@ -224,11 +224,11 @@ export function ServicesPage() {
 
           {/* Loading State */}
           {loading ? (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6">
               {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
                 <div key={i} className="bg-gray-900/40 border border-white/10 rounded-2xl md:rounded-3xl overflow-hidden animate-pulse">
-                  <div className="h-32 md:h-48 bg-gray-800/50" />
-                  <div className="p-4 md:p-6 space-y-3">
+                  <div className="h-28 md:h-48 bg-gray-800/50" />
+                  <div className="p-3 md:p-6 space-y-2 md:space-y-3">
                     <div className="h-4 bg-gray-800/50 rounded w-3/4" />
                     <div className="h-3 bg-gray-800/30 rounded w-full" />
                     <div className="h-3 bg-gray-800/30 rounded w-1/2" />
@@ -248,62 +248,62 @@ export function ServicesPage() {
                     الأقسام
                   </h3>
                   <motion.div
-                    className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6"
+                    className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6"
                   >
-                  <AnimatePresence mode="sync">
-                    {filteredCategories.map((cat, idx) => (
-                      <motion.div
-                        key={cat.id}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
-                        transition={{ duration: 0.3, delay: idx * 0.05, ease: "easeOut" }}
-                        onClick={() => handleCategoryClick(cat.id!)}
-                        className="relative bg-gray-900/40 border border-white/10 rounded-2xl md:rounded-3xl overflow-hidden hover:border-white/30 transition-all duration-500 group cursor-pointer"
-                      >
-                        {/* Image */}
-                        <div className="h-36 md:h-52 overflow-hidden relative">
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent z-10" />
-                          <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-500 z-[5]" />
-                          {cat.imageUrl ? (
-                            <img
-                              src={cat.imageUrl}
-                              alt={cat.name}
-                              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                              referrerPolicy="no-referrer"
-                              loading="lazy"
-                              decoding="async"
-                            />
-                          ) : (
-                            <div className="w-full h-full bg-gradient-to-br from-amber-900/20 to-gray-900/50 flex items-center justify-center">
-                              <FolderOpen size={40} className="text-amber-500/50" />
-                            </div>
-                          )}
-
-                          {/* Content overlaid on image */}
-                          <div className="absolute bottom-0 left-0 right-0 p-4 md:p-5 z-20">
-                            <h3 className="text-sm md:text-xl font-arabic font-black text-white mb-1.5 group-hover:text-gray-100 transition-colors line-clamp-2 drop-shadow-lg">
-                              {cat.name}
-                            </h3>
-                            {cat.description && (
-                              <p className="text-gray-300 font-arabic text-[10px] md:text-xs leading-relaxed line-clamp-2 mb-2 drop-shadow-md">
-                                {cat.description}
-                              </p>
+                    <AnimatePresence mode="sync">
+                      {filteredCategories.map((cat, idx) => (
+                        <motion.div
+                          key={cat.id}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -10 }}
+                          transition={{ duration: 0.3, delay: idx * 0.05, ease: "easeOut" }}
+                          onClick={() => handleCategoryClick(cat.id!)}
+                          className="relative bg-gray-900/40 border border-white/10 rounded-2xl md:rounded-3xl overflow-hidden hover:border-white/30 transition-all duration-500 group cursor-pointer"
+                        >
+                          {/* Image */}
+                          <div className="md:h-52 overflow-hidden relative">
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent z-10" />
+                            <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-500 z-[5]" />
+                            {cat.imageUrl ? (
+                              <img
+                                src={cat.imageUrl}
+                                alt={cat.name}
+                                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                referrerPolicy="no-referrer"
+                                loading="lazy"
+                                decoding="async"
+                              />
+                            ) : (
+                              <div className="w-full h-full bg-gradient-to-br from-amber-900/20 to-gray-900/50 flex items-center justify-center">
+                                <FolderOpen size={40} className="text-amber-500/50" />
+                              </div>
                             )}
-                            <div className="flex items-center gap-2">
-                              <span className="bg-white/20 backdrop-blur-sm text-white text-[9px] md:text-xs font-bold px-2.5 py-1 rounded-full border border-white/10">
-                                {serviceCounts[cat.id!] || 0} خدمة
-                              </span>
-                              <span className="flex items-center gap-1 text-white/60 text-[9px] md:text-xs font-bold group-hover:text-white/90 transition-colors">
-                                <ArrowLeft size={12} className="group-hover:-translate-x-1 transition-transform duration-300" />
-                                <span className="hidden sm:inline">استعراض</span>
-                              </span>
+
+                            {/* Content overlaid on image */}
+                            <div className="absolute bottom-0 left-0 right-0 p-4 md:p-5 z-20">
+                              <h3 className="text-sm md:text-xl font-arabic font-black text-white mb-1.5 group-hover:text-gray-100 transition-colors line-clamp-2 drop-shadow-lg">
+                                {cat.name}
+                              </h3>
+                              {cat.description && (
+                                <p className="text-gray-300 font-arabic text-[10px] md:text-xs leading-relaxed line-clamp-2 mb-2 drop-shadow-md">
+                                  {cat.description}
+                                </p>
+                              )}
+                              <div className="flex items-center gap-2">
+                                <span className="bg-white/20 backdrop-blur-sm text-white text-[9px] md:text-xs font-bold px-2.5 py-1 rounded-full border border-white/10">
+                                  {serviceCounts[cat.id!] || 0} خدمة
+                                </span>
+                                <span className="flex items-center gap-1 text-white/60 text-[9px] md:text-xs font-bold group-hover:text-white/90 transition-colors">
+                                  <ArrowLeft size={12} className="group-hover:-translate-x-1 transition-transform duration-300" />
+                                  <span className="hidden sm:inline">استعراض</span>
+                                </span>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      </motion.div>
-                    ))}
-                  </AnimatePresence>
+                        </motion.div>
+                      ))}
+                    </AnimatePresence>
                   </motion.div>
                 </>
               ) : null}
@@ -315,7 +315,7 @@ export function ServicesPage() {
                     <span className="w-1.5 h-6 bg-white/30 rounded-full" />
                     خدمات أخرى
                   </h3>
-                  <motion.div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+                  <motion.div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6">
                     <AnimatePresence mode="sync">
                       {uncategorizedByType[activeCategory].filter(s =>
                         !searchQuery || s.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -341,19 +341,19 @@ export function ServicesPage() {
 
               {/* Empty state for Category Cards View */}
               {filteredCategories.length === 0 && (!uncategorizedByType[activeCategory] || uncategorizedByType[activeCategory].length === 0) && (
-                <motion.div 
+                <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   className="flex flex-col items-center justify-center py-24 text-center space-y-6"
                 >
                   <motion.div
-                    animate={{ 
+                    animate={{
                       y: [0, -15, 0],
                     }}
-                    transition={{ 
-                      duration: 4, 
-                      repeat: Infinity, 
-                      ease: "easeInOut" 
+                    transition={{
+                      duration: 4,
+                      repeat: Infinity,
+                      ease: "easeInOut"
                     }}
                     className="relative"
                   >
@@ -372,7 +372,7 @@ export function ServicesPage() {
           ) : (
             /* ─── Direct Services View (All / Favorites) ─── */
             <>
-              <motion.div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+              <motion.div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6">
                 <AnimatePresence mode="sync">
                   {searchedServices.map((service) => (
                     <ServiceCard
@@ -393,20 +393,20 @@ export function ServicesPage() {
 
               {/* Empty State */}
               {searchedServices.length === 0 && (
-                <motion.div 
+                <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   className="flex flex-col items-center justify-center py-24 text-center space-y-6"
                 >
                   <motion.div
-                    animate={{ 
+                    animate={{
                       y: [0, -15, 0],
                       scale: [1, 1.05, 1]
                     }}
-                    transition={{ 
-                      duration: 3, 
-                      repeat: Infinity, 
-                      ease: "easeInOut" 
+                    transition={{
+                      duration: 3,
+                      repeat: Infinity,
+                      ease: "easeInOut"
                     }}
                     className="relative"
                   >
@@ -503,8 +503,8 @@ function ServiceCard({
       className="bg-gray-900/40 border border-white/10 rounded-2xl md:rounded-3xl overflow-hidden hover:border-white/30 transition-all duration-500 group flex flex-col cursor-pointer"
     >
       {/* Image */}
-      <div className="h-32 md:h-48 overflow-hidden relative">
-        <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors duration-500 z-10" />
+      <div className="relative overflow-hidden md:h-48 bg-gradient-to-br from-gray-900/80 via-[#0d0d0d] to-black">
+        <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-500 z-10" />
         {/* Tag */}
         {service.type && (
           <div className="absolute top-2 right-2 md:top-3 md:right-3 z-20">
@@ -524,7 +524,7 @@ function ServiceCard({
           <img
             src={service.imageUrl}
             alt={service.title}
-            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+            className="w-full h-auto md:h-full md:w-full object-scale-down md:object-cover transition-transform duration-700 group-hover:scale-105 md:group-hover:scale-110 max-h-[180px] md:max-h-none"
             referrerPolicy="no-referrer"
             loading="lazy"
             decoding="async"
@@ -537,11 +537,11 @@ function ServiceCard({
       </div>
 
       {/* Content */}
-      <div className="p-4 md:p-6 flex flex-col flex-grow">
-        <h3 className="text-sm md:text-lg font-arabic font-bold text-white mb-1.5 md:mb-2 group-hover:text-gray-200 transition-colors line-clamp-2">
+      <div className="p-3 md:p-6 flex flex-col flex-grow">
+        <h3 className="text-[13px] md:text-lg font-arabic font-bold text-white mb-1 md:mb-2 group-hover:text-gray-200 transition-colors line-clamp-2 leading-snug">
           {service.title}
         </h3>
-        <p className="text-gray-400 font-arabic text-[10px] md:text-sm leading-relaxed mb-3 md:mb-5 flex-grow line-clamp-2 md:line-clamp-3">
+        <p className="text-gray-400 font-arabic text-[10px] md:text-sm leading-relaxed mb-2 md:mb-5 flex-grow line-clamp-3">
           {service.description}
         </p>
 
@@ -566,10 +566,10 @@ function ServiceCard({
             onClick={(e) => handleAddToCart(service, e)}
             disabled={cartLoading === service.id}
             className={`w-10 md:w-12 py-2 md:py-3 rounded-lg md:rounded-xl flex items-center justify-center transition-all duration-300 ${addedToCart === service.id
-                ? "bg-emerald-500/20 border border-emerald-500/30 text-emerald-400"
-                : cartLoading === service.id
-                  ? "bg-white/5 border border-white/10 text-gray-500"
-                  : "bg-white/5 border border-white/10 text-white hover:bg-white/10 hover:border-white/20"
+              ? "bg-emerald-500/20 border border-emerald-500/30 text-emerald-400"
+              : cartLoading === service.id
+                ? "bg-white/5 border border-white/10 text-gray-500"
+                : "bg-white/5 border border-white/10 text-white hover:bg-white/10 hover:border-white/20"
               }`}
             title="أضف للسلة"
           >

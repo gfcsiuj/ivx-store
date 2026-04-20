@@ -1,9 +1,15 @@
 import { motion } from 'motion/react';
+import { useSettings } from '../lib/SettingsContext';
 
 export function WhatsAppButton() {
+  const { settings } = useSettings();
+
+  // Ensure default fallback if settings somehow fail, but use the dynamic value
+  const whatsappNum = settings?.whatsappNumber?.replace(/[^0-9]/g, '') || "9647830796658";
+
   return (
     <motion.a
-      href="https://wa.me/9647830796658"
+      href={`https://wa.me/${whatsappNum}`}
       target="_blank"
       rel="noopener noreferrer"
       className="fixed bottom-24 md:bottom-8 right-4 md:right-8 z-50 w-14 h-14 bg-white text-black rounded-full flex items-center justify-center shadow-[0_8px_25px_rgba(255,255,255,0.2)] hover:shadow-[0_12px_35px_rgba(255,255,255,0.4)] hover:-translate-y-1 transition-all duration-300 hover-trigger"
