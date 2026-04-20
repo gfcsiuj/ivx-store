@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { motion } from "motion/react";
 import { PageHero } from "../components/PageHero";
 import { PageLayout } from "../components/PageLayout";
-import { MapPin, Phone, Mail, Instagram, ArrowLeft, MessageCircle, Loader2, CheckCircle2 } from "lucide-react";
+import { MapPin, Phone, Mail, Instagram, ArrowLeft, MessageCircle, Loader2, CheckCircle2, Terminal, Send, Code, Monitor, Cpu, Zap } from "lucide-react";
 import { addMessage } from "../lib/firebase";
 
 export function ContactPage() {
@@ -233,6 +233,114 @@ export function ContactPage() {
               )}
             </motion.div>
           </div>
+          {/* Developer Credit Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="mt-8 max-w-6xl mx-auto bg-white/[0.05] p-[1px] rounded-[2rem] overflow-hidden"
+          >
+            <div className="bg-[#0a0a0c]/90 md:bg-[#0a0a0c]/80 backdrop-blur-md md:backdrop-blur-3xl rounded-[calc(2rem-1px)] p-6 md:p-10 flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden group">
+              <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/[0.03] via-purple-500/[0.02] to-transparent pointer-events-none" />
+              <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-[100px] group-hover:bg-indigo-500/20 transition-all duration-700" />
+              <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-500/10 rounded-full blur-[100px] group-hover:bg-purple-500/20 transition-all duration-700" />
+
+              <div className="relative z-10 flex flex-col items-center md:items-start text-center md:text-right w-full">
+                <div className="flex items-center gap-3 mb-5">
+                  <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center shadow-[0_0_20px_rgba(99,102,241,0.1)]">
+                    <Terminal className="text-indigo-400 w-6 h-6" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl md:text-2xl font-black text-white font-arabic drop-shadow-md">المطور</h3>
+                    <p className="text-xs text-indigo-400 font-arabic font-bold">The Developer</p>
+                  </div>
+                </div>
+                <p className="text-gray-400 font-arabic text-sm md:text-base leading-relaxed max-w-2xl mb-8">
+                  تم تصميم وبرمجة هذا النظام بشغف وإتقان بواسطة <span className="font-bold text-white bg-white/5 border border-white/10 px-2.5 py-1 rounded-lg">محمد حازم احمد</span> باستخدام أحدث التقنيات مثل <span className="font-bold text-indigo-400">React</span> و <span className="font-bold text-blue-400">TailwindCSS</span> مع واجهات تفاعلية سريعة ومتقدمة مبنية بدقة واحترافية عالية.
+                </p>
+
+                <div className="flex flex-col sm:flex-row items-center gap-5 border-t border-white/[0.05] pt-6 w-full md:w-auto">
+                  <span className="text-sm text-gray-500 font-arabic font-bold whitespace-nowrap">تواصل مع المطور :</span>
+                  <div className="flex items-center gap-3">
+                    {/* Telegram */}
+                    <a href="https://t.me/dagg_iq" target="_blank" rel="noopener noreferrer" className="w-12 h-12 rounded-2xl bg-gray-900 border border-white/5 text-blue-400 flex items-center justify-center hover:bg-blue-500 hover:text-white hover:border-blue-500 hover:shadow-[0_0_20px_rgba(59,130,246,0.3)] hover:-translate-y-1.5 transition-all duration-300" title="Contact via Telegram">
+                      <Send size={20} className="-ml-0.5" />
+                    </a>
+                    {/* WhatsApp */}
+                    <a href="https://wa.me/9647771821250" target="_blank" rel="noopener noreferrer" className="w-12 h-12 rounded-2xl bg-gray-900 border border-white/5 text-green-400 flex items-center justify-center hover:bg-green-500 hover:text-white hover:border-green-500 hover:shadow-[0_0_20px_rgba(34,197,94,0.3)] hover:-translate-y-1.5 transition-all duration-300" title="Contact via WhatsApp">
+                      <Phone size={20} />
+                    </a>
+                    {/* Instagram */}
+                    <a href="https://www.instagram.com/dagg_iq" target="_blank" rel="noopener noreferrer" className="w-12 h-12 rounded-2xl bg-gray-900 border border-white/5 text-pink-400 flex items-center justify-center hover:bg-gradient-to-tr hover:from-[#f09433] hover:via-[#e6683c] hover:to-[#bc1888] hover:text-white hover:border-transparent hover:shadow-[0_0_20px_rgba(236,72,153,0.3)] hover:-translate-y-1.5 transition-all duration-300" title="Contact via Instagram">
+                      <Instagram size={20} />
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+              <div className="relative z-10 shrink-0 hidden md:block pl-4">
+                <div className="w-32 h-32 lg:w-44 lg:h-44 relative flex items-center justify-center overflow-visible">
+                  {/* Glow Behind */}
+                  <div className="absolute inset-0 bg-blue-600/20 blur-[40px] rounded-full mix-blend-screen" />
+
+                  {/* Main Center Icon - Monitor */}
+                  <motion.div
+                    animate={{ y: [0, -10, 0] }}
+                    transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                    className="relative z-20 w-20 h-20 lg:w-24 lg:h-24 rounded-3xl bg-black border border-white/10 flex flex-col items-center justify-center shadow-[0_0_40px_rgba(59,130,246,0.3)] backdrop-blur-sm"
+                  >
+                    <Monitor className="w-10 h-10 lg:w-12 lg:h-12 text-blue-400" strokeWidth={1} />
+
+                    {/* Inner Screen Code Pulse */}
+                    <motion.div
+                      animate={{ opacity: [0.3, 1, 0.3] }}
+                      transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                      className="absolute inset-0 flex items-center justify-center overflow-hidden rounded-3xl"
+                    >
+                      <Code className="w-5 h-5 lg:w-6 lg:h-6 text-indigo-400/80 mb-2" strokeWidth={1.5} />
+                    </motion.div>
+                  </motion.div>
+
+                  {/* Orbiting Ring 1 */}
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                    className="absolute inset-0 z-10 rounded-full border border-white/[0.08]"
+                  >
+                    {/* Zap */}
+                    <motion.div
+                      animate={{ rotate: -360 }}
+                      transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                      className="absolute top-0 right-1/2 translate-x-1/2 -translate-y-1/2 w-10 h-10 bg-gray-950 border border-indigo-500/40 rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(99,102,241,0.5)]"
+                    >
+                      <Zap className="w-5 h-5 text-indigo-400" fill="currentColor" />
+                    </motion.div>
+
+                    {/* Cpu */}
+                    <motion.div
+                      animate={{ rotate: -360 }}
+                      transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                      className="absolute bottom-[10%] right-[5%] w-11 h-11 bg-gray-950 border border-purple-500/40 rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(168,85,247,0.5)]"
+                    >
+                      <Cpu className="w-5 h-5 text-purple-400" />
+                    </motion.div>
+                  </motion.div>
+
+                  {/* Inner subtle orbit ring */}
+                  <motion.div
+                    animate={{ rotate: -360 }}
+                    transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+                    className="absolute inset-6 z-10 rounded-full border border-dashed border-white/[0.05]"
+                  >
+                    <div className="absolute top-0 left-4 w-2 h-2 bg-pink-500/80 rounded-full shadow-[0_0_15px_rgba(236,72,153,1)]" />
+                    <div className="absolute bottom-2 right-4 w-1.5 h-1.5 bg-blue-400/80 rounded-full shadow-[0_0_15px_rgba(96,165,250,1)]" />
+                  </motion.div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
         </div>
       </section>
     </PageLayout>

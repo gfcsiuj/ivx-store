@@ -45,7 +45,7 @@ export function Hero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/10 backdrop-blur-md border border-white/20 shadow-sm rounded-full text-white font-bold text-sm"
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/10 backdrop-blur-sm md:backdrop-blur-md border border-white/20 shadow-sm rounded-full text-white font-bold text-sm"
           >
             <Gamepad2 className="w-4 h-4 text-white" />
             متجر الألعاب الأول في العراق
@@ -111,7 +111,7 @@ export function Hero() {
               onClick={() => navigate('/contact')}
               whileHover={{ scale: 1.05, backgroundColor: "rgba(255,255,255,0.1)" }}
               whileTap={{ scale: 0.95 }}
-              className="w-full sm:w-auto px-8 py-3 md:py-4 bg-white/5 backdrop-blur-md border border-white/20 shadow-sm text-white font-bold rounded-2xl transition-all font-arabic text-base md:text-lg flex items-center justify-center gap-3 group hover:shadow-md"
+              className="w-full sm:w-auto px-8 py-3 md:py-4 bg-white/5 backdrop-blur-sm md:backdrop-blur-md border border-white/20 shadow-sm text-white font-bold rounded-2xl transition-all font-arabic text-base md:text-lg flex items-center justify-center gap-3 group hover:shadow-md"
             >
               <span>تواصل معنا</span>
               <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">

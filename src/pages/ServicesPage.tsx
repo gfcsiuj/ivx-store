@@ -306,12 +306,7 @@ export function ServicesPage() {
                   </AnimatePresence>
                   </motion.div>
                 </>
-              ) : (
-                <div className="text-center py-20">
-                  <div className="text-6xl mb-4">📁</div>
-                  <p className="text-gray-400 font-arabic text-lg font-medium">لا توجد أقسام في هذا التصنيف حالياً</p>
-                </div>
-              )}
+              ) : null}
 
               {/* Show uncategorized services for this type if any */}
               {uncategorizedByType[activeCategory] && uncategorizedByType[activeCategory].length > 0 && (
@@ -343,6 +338,36 @@ export function ServicesPage() {
                   </motion.div>
                 </div>
               )}
+
+              {/* Empty state for Category Cards View */}
+              {filteredCategories.length === 0 && (!uncategorizedByType[activeCategory] || uncategorizedByType[activeCategory].length === 0) && (
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="flex flex-col items-center justify-center py-24 text-center space-y-6"
+                >
+                  <motion.div
+                    animate={{ 
+                      y: [0, -15, 0],
+                    }}
+                    transition={{ 
+                      duration: 4, 
+                      repeat: Infinity, 
+                      ease: "easeInOut" 
+                    }}
+                    className="relative"
+                  >
+                    <div className="absolute inset-0 bg-blue-500/20 blur-3xl rounded-full w-24 h-24 sm:w-32 sm:h-32 -z-10 mix-blend-screen" />
+                    <FolderOpen size={80} className="text-blue-400/50 drop-shadow-[0_0_15px_rgba(59,130,246,0.5)]" strokeWidth={1} />
+                  </motion.div>
+                  <div className="space-y-2">
+                    <h3 className="text-xl md:text-2xl font-arabic font-black text-white">لا توجد أقسام أو خدمات هنا</h3>
+                    <p className="text-gray-400 font-arabic text-sm md:text-base max-w-xs mx-auto">
+                      يبدو أن هذا التصنيف فارغ حالياً. سنقوم بإضافة المزيد قريباً!
+                    </p>
+                  </div>
+                </motion.div>
+              )}
             </>
           ) : (
             /* ─── Direct Services View (All / Favorites) ─── */
@@ -368,10 +393,33 @@ export function ServicesPage() {
 
               {/* Empty State */}
               {searchedServices.length === 0 && (
-                <div className="text-center py-20">
-                  <div className="text-6xl mb-4">🔍</div>
-                  <p className="text-gray-400 font-arabic text-lg font-medium">لا توجد خدمات في هذا القسم حالياً</p>
-                </div>
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="flex flex-col items-center justify-center py-24 text-center space-y-6"
+                >
+                  <motion.div
+                    animate={{ 
+                      y: [0, -15, 0],
+                      scale: [1, 1.05, 1]
+                    }}
+                    transition={{ 
+                      duration: 3, 
+                      repeat: Infinity, 
+                      ease: "easeInOut" 
+                    }}
+                    className="relative"
+                  >
+                    <div className="absolute inset-0 bg-purple-500/20 blur-3xl rounded-full w-24 h-24 sm:w-32 sm:h-32 -z-10 mix-blend-screen" />
+                    <Search size={80} className="text-purple-400/50 drop-shadow-[0_0_15px_rgba(168,85,247,0.5)]" strokeWidth={1} />
+                  </motion.div>
+                  <div className="space-y-2">
+                    <h3 className="text-xl md:text-2xl font-arabic font-black text-white">لم نجد ما تبحث عنه</h3>
+                    <p className="text-gray-400 font-arabic text-sm md:text-base max-w-xs mx-auto">
+                      لا توجد خدمات مطابقة لبحثك في هذا القسم حالياً.
+                    </p>
+                  </div>
+                </motion.div>
               )}
             </>
           )}

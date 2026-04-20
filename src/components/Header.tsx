@@ -88,7 +88,7 @@ export function Header() {
             <div className="relative">
               <button
                 onClick={(e) => { e.stopPropagation(); setShowAccountModal(true); }}
-                className="w-11 h-11 rounded-full overflow-hidden border-2 border-white/20 hover:border-white/50 transition-all duration-300 flex items-center justify-center bg-black/60 backdrop-blur-xl shrink-0 shadow-lg"
+                className="w-11 h-11 rounded-full overflow-hidden border-2 border-white/20 hover:border-white/50 transition-all duration-300 flex items-center justify-center bg-black/80 md:bg-black/60 backdrop-blur-md md:backdrop-blur-xl shrink-0 shadow-lg"
               >
                 {userPhoto ? (
                   <img src={userPhoto} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
@@ -100,7 +100,7 @@ export function Header() {
           ) : (
             <button
               onClick={() => setShowAuthModal(true)}
-              className="h-11 px-5 rounded-full bg-black/60 backdrop-blur-xl border border-white/15 text-white text-sm font-bold font-arabic flex items-center gap-2 hover:bg-black/80 hover:border-white/30 transition-all duration-300 shrink-0 shadow-lg"
+              className="h-11 px-5 rounded-full bg-black/80 md:bg-black/60 backdrop-blur-md md:backdrop-blur-xl border border-white/15 text-white text-sm font-bold font-arabic flex items-center gap-2 hover:bg-black/90 md:hover:bg-black/80 hover:border-white/30 transition-all duration-300 shrink-0 shadow-lg"
             >
               <User size={16} />
               تسجيل الدخول
@@ -110,7 +110,7 @@ export function Header() {
           {/* Cart Button - Desktop */}
           <button
             onClick={() => setShowCart(true)}
-            className="w-11 h-11 rounded-full bg-black/60 backdrop-blur-xl border border-white/15 flex items-center justify-center text-white hover:bg-black/80 hover:border-white/30 transition-all duration-300 shadow-lg"
+            className="w-11 h-11 rounded-full bg-black/80 md:bg-black/60 backdrop-blur-md md:backdrop-blur-xl border border-white/15 flex items-center justify-center text-white hover:bg-black/90 md:hover:bg-black/80 hover:border-white/30 transition-all duration-300 shadow-lg"
           >
             <ShoppingBag size={18} />
           </button>
@@ -120,8 +120,8 @@ export function Header() {
         <div 
           className={`pointer-events-auto flex items-center justify-between md:justify-center w-[98%] sm:w-[95%] md:w-auto gap-1 md:gap-6 p-1 md:p-2 rounded-full transition-colors duration-500 ${
             isTop 
-              ? "bg-black/60 backdrop-blur-xl border border-white/10" 
-              : "bg-black/80 backdrop-blur-2xl border border-white/20 shadow-[0_8px_32px_-8px_rgba(255,255,255,0.1)]"
+              ? "bg-black/90 md:bg-black/60 backdrop-blur-md md:backdrop-blur-xl border border-white/10" 
+              : "bg-black/95 md:bg-black/80 backdrop-blur-lg md:backdrop-blur-2xl border border-white/20 shadow-[0_8px_32px_-8px_rgba(255,255,255,0.1)]"
           }`}
         >
           {/* Logo & Mobile CTA Area */}
@@ -200,8 +200,7 @@ export function Header() {
               {/* Mobile Currency Switcher */}
               <button
                 onClick={() => setShowCurrencyModal(true)}
-                className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-colors shrink-0"
-                style={{ backdropFilter: "blur(10px)" }}
+                className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/20 md:bg-white/10 flex items-center justify-center text-white hover:bg-white/30 transition-colors shrink-0 backdrop-blur-md"
               >
                 <span className="text-lg sm:text-xl filter drop-shadow-sm leading-none m-0 p-0" style={{ transform: "translateY(1px)" }}>
                   {currentCurrencyInfo.flag}
@@ -211,8 +210,7 @@ export function Header() {
               {/* Mobile Heart */}
               <button
                 onClick={() => setShowFavorites(true)}
-                className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-colors shrink-0"
-                style={{ backdropFilter: "blur(10px)" }}
+                className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/20 md:bg-white/10 flex items-center justify-center text-white hover:bg-white/30 transition-colors shrink-0 backdrop-blur-md"
               >
                 <Heart size={15} className="sm:w-4 sm:h-4" />
               </button>
@@ -220,8 +218,7 @@ export function Header() {
               {/* Mobile Cart */}
               <button
                 onClick={() => setShowCart(true)}
-                className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-colors shrink-0"
-                style={{ backdropFilter: "blur(10px)" }}
+                className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/20 md:bg-white/10 flex items-center justify-center text-white hover:bg-white/30 transition-colors shrink-0 backdrop-blur-md"
               >
                 <ShoppingBag size={15} className="sm:w-4 sm:h-4" />
               </button>
@@ -241,8 +238,7 @@ export function Header() {
               ) : (
                 <button
                   onClick={() => setShowAuthModal(true)}
-                  className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/10 border border-white/10 text-white flex items-center justify-center hover:bg-white/20 transition-colors shrink-0"
-                  style={{ backdropFilter: "blur(10px)" }}
+                  className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/20 md:bg-white/10 border border-white/10 text-white flex items-center justify-center hover:bg-white/30 transition-colors shrink-0 backdrop-blur-md"
                 >
                   <User size={15} className="sm:w-4 sm:h-4" />
                 </button>

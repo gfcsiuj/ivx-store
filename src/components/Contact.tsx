@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "motion/react";
-import { MapPin, Phone, Mail, Instagram, ArrowLeft, Loader2, CheckCircle2 } from "lucide-react";
+import { MapPin, Phone, Mail, Instagram, ArrowLeft, Loader2, CheckCircle2, Terminal, Send } from "lucide-react";
 import { addMessage, getSettings, SiteSettings } from "../lib/firebase";
 
 export function Contact() {
@@ -266,6 +266,61 @@ export function Contact() {
                 </button>
               </form>
             )}
+          </motion.div>
+          </motion.div>
+
+          {/* Developer Credit Section */}
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="mt-4 md:mt-8 col-span-1 lg:col-span-2 bg-gradient-to-r from-gray-800 via-gray-700 to-gray-800 p-[1px] rounded-3xl md:rounded-[2rem] overflow-hidden"
+          >
+            <div className="bg-gray-900 rounded-3xl md:rounded-[calc(2rem-1px)] p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden group">
+                <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-purple-500/5 to-transparent pointer-events-none" />
+                <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/20 rounded-full blur-3xl group-hover:bg-indigo-500/30 transition-colors" />
+                <div className="absolute bottom-0 left-0 w-32 h-32 bg-purple-500/20 rounded-full blur-3xl group-hover:bg-purple-500/30 transition-colors" />
+                
+                <div className="relative z-10 flex flex-col items-center md:items-start text-center md:text-right w-full">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 rounded-xl bg-indigo-500/20 flex items-center justify-center">
+                        <Terminal className="text-indigo-400 w-5 h-5" />
+                    </div>
+                    <h3 className="text-xl md:text-2xl font-black text-white font-arabic">مطور الموقع</h3>
+                  </div>
+                  <p className="text-gray-300 font-arabic text-sm md:text-base leading-relaxed max-w-2xl mb-6">
+                    تم تصميم وبرمجة هذا النظام بشغف وإتقان بواسطة <span className="font-bold text-white bg-white/10 px-2 py-0.5 rounded-md">محمد حازم احمد</span> باستخدام أحدث التقنيات مثل <span className="font-bold text-indigo-400">React</span> و <span className="font-bold text-blue-400">TailwindCSS</span> مع واجهات تفاعلية سريعة ومتقدمة.
+                  </p>
+                  
+                  <div className="flex flex-col sm:flex-row items-center gap-4 border-t border-white/5 pt-5 w-full md:w-auto">
+                      <span className="text-sm text-gray-400 font-arabic font-bold whitespace-nowrap">تواصل مع المطور :</span>
+                      <div className="flex items-center gap-3">
+                          {/* Telegram */}
+                          <a href="https://t.me/dagg_iq" target="_blank" rel="noopener noreferrer" className="w-11 h-11 rounded-full bg-gray-800 border border-gray-700 text-blue-400 flex items-center justify-center hover:bg-blue-500 hover:text-white hover:border-blue-500 hover:shadow-[0_0_15px_rgba(59,130,246,0.4)] hover:-translate-y-1 transition-all duration-300" title="Contact via Telegram">
+                              <Send size={18} className="-ml-0.5" />
+                          </a>
+                          {/* WhatsApp */}
+                          <a href="https://wa.me/9647771821250" target="_blank" rel="noopener noreferrer" className="w-11 h-11 rounded-full bg-gray-800 border border-gray-700 text-green-400 flex items-center justify-center hover:bg-green-500 hover:text-white hover:border-green-500 hover:shadow-[0_0_15px_rgba(34,197,94,0.4)] hover:-translate-y-1 transition-all duration-300" title="Contact via WhatsApp">
+                              <Phone size={18} />
+                          </a>
+                          {/* Instagram */}
+                          <a href="https://www.instagram.com/dagg_iq" target="_blank" rel="noopener noreferrer" className="w-11 h-11 rounded-full bg-gray-800 border border-gray-700 text-pink-400 flex items-center justify-center hover:bg-gradient-to-tr hover:from-[#f09433] hover:via-[#e6683c] hover:to-[#bc1888] hover:text-white hover:border-transparent hover:shadow-[0_0_15px_rgba(236,72,153,0.4)] hover:-translate-y-1 transition-all duration-300" title="Contact via Instagram">
+                              <Instagram size={18} />
+                          </a>
+                      </div>
+                  </div>
+                </div>
+
+                <div className="relative z-10 shrink-0 hidden md:block">
+                    <div className="w-28 h-28 lg:w-32 lg:h-32 rounded-3xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 p-1 group-hover:scale-105 transition-transform duration-500">
+                        <div className="w-full h-full bg-gray-900 rounded-[calc(1.5rem-1px)] flex flex-col items-center justify-center relative overflow-hidden">
+                            <div className="absolute inset-0 bg-white/5" />
+                            <span className="text-5xl lg:text-5xl drop-shadow-2xl translate-y-1">👨‍💻</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
           </motion.div>
 
         </div>

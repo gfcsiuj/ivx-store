@@ -193,7 +193,7 @@ export function OffersSection() {
 
                     {/* Discount — top left */}
                     <div className="absolute top-4 left-4 z-10">
-                      <div className="bg-black/60 backdrop-blur-md text-white text-lg md:text-xl font-black px-3 py-1 rounded-xl border border-white/10">
+                      <div className="bg-black/60 backdrop-blur-sm md:backdrop-blur-md text-white text-lg md:text-xl font-black px-3 py-1 rounded-xl border border-white/10">
                         {offer.discount}%<span className="text-[10px] font-bold text-gray-400 mr-0.5">خصم</span>
                       </div>
                     </div>
