@@ -386,6 +386,7 @@ export function ServicesPage() {
         itemType="service"
         basePrice={selectedService?.price ? parseFloat(selectedService.price) : undefined}
         baseCurrency={selectedService?.currency}
+        dynamicPricingMode={selectedService?.dynamicPricingMode}
       />
 
       <ServiceDetailsModal

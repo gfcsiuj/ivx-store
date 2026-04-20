@@ -148,8 +148,9 @@ export function ServiceEditor({ serviceId, onBack, onSaved }: ServiceEditorProps
     setSaving(true);
     try {
       const saveData = { ...data };
-      // Auto-set price from dynamic pricing when active
-      if (hasDynamicPricing && dynamicBasePrice) {
+      // Auto-set price from dynamic pricing when in "replace" mode (default)
+      const pricingMode = data.dynamicPricingMode || "replace";
+      if (hasDynamicPricing && dynamicBasePrice && pricingMode === "replace") {
         saveData.price = String(dynamicBasePrice.price);
         saveData.currency = dynamicBasePrice.currency;
       }
@@ -253,12 +254,12 @@ export function ServiceEditor({ serviceId, onBack, onSaved }: ServiceEditorProps
                   <div style={{ flex: 1, position: "relative" }}>
                     <input
                       className="admin-form-input"
-                      value={hasDynamicPricing && dynamicBasePrice ? formatPriceWithCommas(String(dynamicBasePrice.price)) : priceDisplay}
+                      value={hasDynamicPricing && dynamicBasePrice && (data.dynamicPricingMode || "replace") === "replace" ? formatPriceWithCommas(String(dynamicBasePrice.price)) : priceDisplay}
                       onChange={(e) => handlePriceChange(e.target.value)}
                       placeholder="مثال: 25,000"
                       dir="ltr"
-                      disabled={hasDynamicPricing}
-                      style={{ paddingLeft: "3rem", ...(hasDynamicPricing ? { opacity: 0.5, cursor: "not-allowed" } : {}) }}
+                      disabled={hasDynamicPricing && (data.dynamicPricingMode || "replace") === "replace"}
+                      style={{ paddingLeft: "3rem", ...(hasDynamicPricing && (data.dynamicPricingMode || "replace") === "replace" ? { opacity: 0.5, cursor: "not-allowed" } : {}) }}
                     />
                     <span
                       style={{
@@ -272,41 +273,99 @@ export function ServiceEditor({ serviceId, onBack, onSaved }: ServiceEditorProps
                         pointerEvents: "none",
                       }}
                     >
-                      {(hasDynamicPricing && dynamicBasePrice ? dynamicBasePrice.currency : data.currency) === "USD" ? "$" : "د.ع"}
+                      {(hasDynamicPricing && dynamicBasePrice && (data.dynamicPricingMode || "replace") === "replace" ? dynamicBasePrice.currency : data.currency) === "USD" ? "$" : "د.ع"}
                     </span>
                   </div>
                   <div className="admin-currency-toggle">
                     <button
                       onClick={() => handleChange("currency", "USD" as Currency)}
-                      className={`admin-currency-btn ${(hasDynamicPricing && dynamicBasePrice ? dynamicBasePrice.currency : data.currency) === "USD" ? "active" : ""}`}
-                      disabled={hasDynamicPricing}
-                      style={hasDynamicPricing ? { opacity: 0.5, cursor: "not-allowed" } : {}}
+                      className={`admin-currency-btn ${(hasDynamicPricing && dynamicBasePrice && (data.dynamicPricingMode || "replace") === "replace" ? dynamicBasePrice.currency : data.currency) === "USD" ? "active" : ""}`}
+                      disabled={hasDynamicPricing && (data.dynamicPricingMode || "replace") === "replace"}
+                      style={hasDynamicPricing && (data.dynamicPricingMode || "replace") === "replace" ? { opacity: 0.5, cursor: "not-allowed" } : {}}
                     >
                       $ دولار
                     </button>
                     <button
                       onClick={() => handleChange("currency", "IQD" as Currency)}
-                      className={`admin-currency-btn ${(hasDynamicPricing && dynamicBasePrice ? dynamicBasePrice.currency : data.currency) === "IQD" ? "active" : ""}`}
-                      disabled={hasDynamicPricing}
-                      style={hasDynamicPricing ? { opacity: 0.5, cursor: "not-allowed" } : {}}
+                      className={`admin-currency-btn ${(hasDynamicPricing && dynamicBasePrice && (data.dynamicPricingMode || "replace") === "replace" ? dynamicBasePrice.currency : data.currency) === "IQD" ? "active" : ""}`}
+                      disabled={hasDynamicPricing && (data.dynamicPricingMode || "replace") === "replace"}
+                      style={hasDynamicPricing && (data.dynamicPricingMode || "replace") === "replace" ? { opacity: 0.5, cursor: "not-allowed" } : {}}
                     >
                       د.ع دينار
                     </button>
                   </div>
                 </div>
                 {hasDynamicPricing && (
-                  <div style={{
-                    marginTop: "0.5rem",
-                    padding: "0.6rem 0.75rem",
-                    borderRadius: "0.6rem",
-                    background: "rgba(59, 130, 246, 0.08)",
-                    border: "1px solid rgba(59, 130, 246, 0.15)",
-                    fontSize: "0.75rem",
-                    color: "#60a5fa",
-                    fontWeight: 600,
-                  }}>
-                    💡 السعر يُحسب تلقائياً من التسعير الديناميكي في نموذج الطلب
-                  </div>
+                  <>
+                    {/* Dynamic Pricing Mode Toggle */}
+                    <div style={{
+                      marginTop: "0.75rem",
+                      padding: "0.75rem",
+                      borderRadius: "0.75rem",
+                      background: "rgba(255,255,255,0.03)",
+                      border: "1px solid rgba(255,255,255,0.08)",
+                    }}>
+                      <div style={{
+                        fontSize: "0.75rem",
+                        fontWeight: 800,
+                        color: "#aaa",
+                        marginBottom: "0.5rem",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "0.35rem",
+                      }}>
+                        ⚙️ وضع التسعير الديناميكي
+                      </div>
+                      <div style={{ display: "flex", gap: "0.5rem" }}>
+                        <button
+                          onClick={() => handleChange("dynamicPricingMode", "replace")}
+                          style={{
+                            flex: 1,
+                            padding: "0.55rem 0.75rem",
+                            borderRadius: "0.6rem",
+                            fontSize: "0.75rem",
+                            fontWeight: 700,
+                            border: `1px solid ${(data.dynamicPricingMode || "replace") === "replace" ? "rgba(59,130,246,0.4)" : "rgba(255,255,255,0.08)"}`,
+                            background: (data.dynamicPricingMode || "replace") === "replace" ? "rgba(59,130,246,0.12)" : "rgba(255,255,255,0.03)",
+                            color: (data.dynamicPricingMode || "replace") === "replace" ? "#60a5fa" : "#666",
+                            transition: "all 0.2s ease",
+                            fontFamily: "inherit",
+                          }}
+                        >
+                          🔄 استبدال السعر
+                        </button>
+                        <button
+                          onClick={() => handleChange("dynamicPricingMode", "addon")}
+                          style={{
+                            flex: 1,
+                            padding: "0.55rem 0.75rem",
+                            borderRadius: "0.6rem",
+                            fontSize: "0.75rem",
+                            fontWeight: 700,
+                            border: `1px solid ${data.dynamicPricingMode === "addon" ? "rgba(16,185,129,0.4)" : "rgba(255,255,255,0.08)"}`,
+                            background: data.dynamicPricingMode === "addon" ? "rgba(16,185,129,0.12)" : "rgba(255,255,255,0.03)",
+                            color: data.dynamicPricingMode === "addon" ? "#34d399" : "#666",
+                            transition: "all 0.2s ease",
+                            fontFamily: "inherit",
+                          }}
+                        >
+                          ➕ إضافة فوق السعر
+                        </button>
+                      </div>
+                      <div style={{
+                        marginTop: "0.5rem",
+                        fontSize: "0.7rem",
+                        color: "#555",
+                        fontWeight: 600,
+                        lineHeight: 1.6,
+                      }}>
+                        {(data.dynamicPricingMode || "replace") === "replace"
+                          ? "💡 التسعير الديناميكي يُحسب السعر بالكامل — السعر الأساسي يُعيَّن تلقائياً للعرض في البطاقة"
+                          : "💡 التسعير الديناميكي يُضاف فوق السعر الأساسي — يمكنك تعيين سعر أساسي يدوياً + الزيادة الديناميكية"
+                        }
+                      </div>
+                    </div>
+                  </>
                 )}
               </div>
 

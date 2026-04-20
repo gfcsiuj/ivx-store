@@ -17,6 +17,7 @@ interface OrderModalProps {
   itemType?: "service" | "package" | "offer";
   basePrice?: number;
   baseCurrency?: Currency;
+  dynamicPricingMode?: "replace" | "addon";
 }
 
 // Custom Dropdown Component
@@ -167,7 +168,7 @@ function PriceBreakdown({
   );
 }
 
-export function OrderModal({ isOpen, onClose, selectedItem, formFields, itemType = "service", basePrice, baseCurrency = "USD" }: OrderModalProps) {
+export function OrderModal({ isOpen, onClose, selectedItem, formFields, itemType = "service", basePrice, baseCurrency = "USD", dynamicPricingMode = "replace" }: OrderModalProps) {
   const { isLowEnd } = useDevicePerformance();
   const { user } = useAuth();
   const { formatConvertedPrice, rates } = useCurrency();
@@ -208,7 +209,7 @@ export function OrderModal({ isOpen, onClose, selectedItem, formFields, itemType
     return () => {
       document.body.classList.remove('modal-open');
     };
-  }, [isOpen]);
+  }, [isOpen, fieldsToRender]);
 
   const getFieldValue = (fieldId: string, defaultVal: any = "") => {
     return customFieldValues[fieldId] ?? defaultVal;
@@ -234,8 +235,16 @@ export function OrderModal({ isOpen, onClose, selectedItem, formFields, itemType
       return (amount / fromRate) * toRate;
     };
 
-    // Base price (always in baseCurrency)
-    if (basePrice && basePrice > 0) {
+    // Check if any field has dynamic pricing enabled
+    const hasDynamicFields = fieldsToRender.some(f => f.pricingEnabled && !f.deleted);
+
+    // Base price logic:
+    // - If dynamicPricingMode is "replace" AND there are dynamic pricing fields → skip base price
+    // - If dynamicPricingMode is "addon" OR there are no dynamic pricing fields → include base price
+    const shouldIncludeBasePrice = basePrice && basePrice > 0 && 
+      (!hasDynamicFields || dynamicPricingMode === "addon");
+
+    if (shouldIncludeBasePrice) {
       items.push({ label: selectedItem || "السعر الأساسي", value: basePrice, currency: baseCurrency });
       runningTotal += basePrice;
       anyPricing = true;
@@ -277,7 +286,7 @@ export function OrderModal({ isOpen, onClose, selectedItem, formFields, itemType
     }
 
     return { breakdown: items, total: runningTotal, hasPricing: anyPricing };
-  }, [customFieldValues, fieldsToRender, basePrice, selectedItem, baseCurrency, rates]);
+  }, [customFieldValues, fieldsToRender, basePrice, selectedItem, baseCurrency, rates, dynamicPricingMode]);
 
   const validateForm = (): boolean => {
     for (const field of fieldsToRender) {

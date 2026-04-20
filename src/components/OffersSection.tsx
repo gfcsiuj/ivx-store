@@ -278,6 +278,7 @@ export function OffersSection() {
         itemType="offer"
         basePrice={selectedOffer?.discountedPrice ? parseFloat(selectedOffer.discountedPrice) : undefined}
         baseCurrency={selectedOffer?.currency}
+        dynamicPricingMode={selectedOffer?.dynamicPricingMode}
       />
     </section>
   );

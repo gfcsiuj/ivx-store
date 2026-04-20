@@ -180,6 +180,7 @@ export interface ServiceData {
   type: string;
   categoryId?: string;
   orderFormFields: FormField[];
+  dynamicPricingMode?: "replace" | "addon";
   createdAt?: Timestamp;
   updatedAt?: Timestamp;
 }
@@ -207,6 +208,7 @@ export interface PackageData {
   bgColor?: string;       // e.g. "#1a1a2e" or gradient "linear-gradient(135deg, #1a1a2e, #16213e)"
   accentColor?: string;    // e.g. "#e94560" for buttons/badges
   orderFormFields: FormField[];
+  dynamicPricingMode?: "replace" | "addon";
   createdAt?: Timestamp;
   updatedAt?: Timestamp;
 }
@@ -232,6 +234,7 @@ export interface OfferData {
   endsAt?: Timestamp;        // expiry date
   active: boolean;
   orderFormFields: FormField[];
+  dynamicPricingMode?: "replace" | "addon";
   createdAt?: Timestamp;
   updatedAt?: Timestamp;
 }

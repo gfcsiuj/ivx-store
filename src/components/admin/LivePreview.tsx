@@ -158,7 +158,7 @@ function PreviewPriceBar({ breakdown, total, currency }: { breakdown: { label: s
   );
 }
 
-function FormPreview({ fields, title, basePrice, baseCurrency }: { fields: FormField[]; title: string; basePrice?: number; baseCurrency?: Currency }) {
+function FormPreview({ fields, title, basePrice, baseCurrency, dynamicPricingMode = "replace" }: { fields: FormField[]; title: string; basePrice?: number; baseCurrency?: Currency; dynamicPricingMode?: "replace" | "addon" }) {
   const [fieldValues, setFieldValues] = useState<Record<string, any>>({});
   const currency = baseCurrency || "USD";
 
@@ -178,7 +178,16 @@ function FormPreview({ fields, title, basePrice, baseCurrency }: { fields: FormF
     let runningTotal = 0;
     let anyPricing = false;
 
-    if (basePrice && basePrice > 0 && !isNaN(basePrice)) {
+    // Check if any field has dynamic pricing enabled
+    const hasDynamicFields = visibleFields.some(f => f.pricingEnabled);
+
+    // Base price logic:
+    // - If dynamicPricingMode is "replace" AND there are dynamic pricing fields → skip base price
+    // - If dynamicPricingMode is "addon" OR there are no dynamic pricing fields → include base price
+    const shouldIncludeBasePrice = basePrice && basePrice > 0 && !isNaN(basePrice) &&
+      (!hasDynamicFields || dynamicPricingMode === "addon");
+
+    if (shouldIncludeBasePrice) {
       items.push({ label: title || "السعر الأساسي", value: basePrice });
       runningTotal += basePrice;
       anyPricing = true;
@@ -217,7 +226,7 @@ function FormPreview({ fields, title, basePrice, baseCurrency }: { fields: FormF
     }
 
     return { breakdown: items, total: runningTotal, hasPricing: anyPricing };
-  }, [fieldValues, visibleFields, basePrice, title]);
+  }, [fieldValues, visibleFields, basePrice, title, dynamicPricingMode]);
 
   return (
     <div className="preview-form">
@@ -477,7 +486,7 @@ export function LivePreview(props: LivePreviewProps) {
             معاينة نموذج الطلب — تفاعلية
           </div>
           <div className="admin-preview-body">
-            <FormPreview fields={data.orderFormFields} title={data.title} basePrice={basePrice} baseCurrency={data.currency} />
+            <FormPreview fields={data.orderFormFields} title={data.title} basePrice={basePrice} baseCurrency={data.currency} dynamicPricingMode={data.dynamicPricingMode} />
           </div>
         </div>
       );
@@ -534,7 +543,7 @@ export function LivePreview(props: LivePreviewProps) {
           معاينة نموذج الطلب — تفاعلية
         </div>
         <div className="admin-preview-body">
-          <FormPreview fields={data.orderFormFields} title={data.title} basePrice={basePrice} baseCurrency={data.currency} />
+          <FormPreview fields={data.orderFormFields} title={data.title} basePrice={basePrice} baseCurrency={data.currency} dynamicPricingMode={data.dynamicPricingMode} />
         </div>
       </div>
     );

@@ -270,6 +270,7 @@ export function Packages() {
         itemType="package"
         basePrice={selectedPackage?.price ? parseFloat(selectedPackage.price) : undefined}
         baseCurrency={selectedPackage?.currency}
+        dynamicPricingMode={selectedPackage?.dynamicPricingMode}
       />
     </section>
   );
