@@ -1,0 +1,25 @@
+# IVX Store - Robots.txt
+# https://ivxiq.com
+
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /admin/
+
+# Google-specific
+User-agent: Googlebot
+Allow: /
+Disallow: /admin
+Crawl-delay: 1
+
+# Bing
+User-agent: Bingbot
+Allow: /
+Disallow: /admin
+Crawl-delay: 2
+
+# Sitemap location
+Sitemap: https://ivxiq.com/sitemap.xml
+
+# Host
+Host: https://ivxiq.com

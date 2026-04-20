@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+
+  <!-- ══════════════════════════════════════════ -->
+  <!-- الصفحة الرئيسية - Home Page              -->
+  <!-- ══════════════════════════════════════════ -->
+  <url>
+    <loc>https://ivxiq.com/</loc>
+    <lastmod>2026-04-21</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://ivxiq.com/" />
+    <image:image>
+      <image:loc>https://ivxiq.com/og-image.png</image:loc>
+      <image:title>IVX Store - متجر الألعاب الأول في العراق</image:title>
+      <image:caption>متجر IVX للألعاب الرقمية والاشتراكات في العراق</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://ivxiq.com/icon-512x512.png</image:loc>
+      <image:title>شعار IVX Store</image:title>
+    </image:image>
+  </url>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!-- جميع الخدمات - All Services               -->
+  <!-- ══════════════════════════════════════════ -->
+  <url>
+    <loc>https://ivxiq.com/services</loc>
+    <lastmod>2026-04-21</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.95</priority>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://ivxiq.com/services" />
+  </url>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!-- الباقات - Packages                         -->
+  <!-- ══════════════════════════════════════════ -->
+  <url>
+    <loc>https://ivxiq.com/packages</loc>
+    <lastmod>2026-04-21</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://ivxiq.com/packages" />
+  </url>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!-- تواصل معنا - Contact Us                    -->
+  <!-- ══════════════════════════════════════════ -->
+  <url>
+    <loc>https://ivxiq.com/contact</loc>
+    <lastmod>2026-04-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.75</priority>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://ivxiq.com/contact" />
+  </url>
+
+  <!-- ══════════════════════════════════════════ -->
+  <!-- آراء العملاء - Clients / Testimonials      -->
+  <!-- ══════════════════════════════════════════ -->
+  <url>
+    <loc>https://ivxiq.com/clients</loc>
+    <lastmod>2026-04-21</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.70</priority>
+    <xhtml:link rel="alternate" hreflang="ar" href="https://ivxiq.com/clients" />
+  </url>
+
+</urlset>
