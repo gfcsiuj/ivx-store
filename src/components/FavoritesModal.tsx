@@ -88,7 +88,7 @@ export function FavoritesModal({ isOpen, onClose }: FavoritesModalProps) {
     if (isPackage) {
       navigate('/packages');
     } else {
-      navigate('/services', { state: { activeTab: 'favorites' } });
+      navigate('/services?category=favorites');
     }
   };
 
